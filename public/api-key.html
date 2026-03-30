@@ -7,23 +7,23 @@
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0a0a0f;
-    --bg2: #0f0f18;
-    --bg3: #13131f;
-    --surface: #161625;
-    --surface2: #1c1c2e;
-    --border: #ffffff0d;
-    --border2: #ffffff18;
-    --accent: #6c63ff;
-    --accent2: #8b85ff;
-    --accent-glow: #6c63ff40;
-    --green: #00e5a0;
-    --green-dim: #00e5a015;
-    --red: #ff4d6a;
-    --yellow: #f5c542;
-    --text: #e8e8f0;
-    --text2: #9090b0;
-    --text3: #5a5a7a;
+    --bg: #1f2421;
+    --bg2: #191e1b;
+    --bg3: #141918;
+    --surface: #243028;
+    --surface2: #2a3830;
+    --border: rgba(73,160,120,0.14);
+    --border2: rgba(73,160,120,0.26);
+    --accent: #49a078;
+    --accent2: #9cc5a1;
+    --accent-glow: #49a07840;
+    --green: #49a078;
+    --green-dim: #49a07815;
+    --red: #e06070;
+    --yellow: #d4a843;
+    --text: #dce1de;
+    --text2: #9cc5a1;
+    --text3: #216869;
     --mono: 'JetBrains Mono', monospace;
     --sans: 'Syne', sans-serif;
   }
@@ -61,7 +61,7 @@
     transform: translateX(-50%);
     width: 700px;
     height: 700px;
-    background: radial-gradient(circle, #6c63ff18 0%, transparent 70%);
+    background: radial-gradient(circle, #49a07818 0%, transparent 70%);
     pointer-events: none;
     z-index: 0;
   }
@@ -75,7 +75,7 @@
     justify-content: space-between;
     padding: 20px 48px;
     border-bottom: 1px solid var(--border);
-    background: #0a0a0f99;
+    background: #1f242199;
     backdrop-filter: blur(12px);
   }
 
@@ -273,7 +273,7 @@
 
   .plan-card.selected.pro {
     border-color: var(--yellow);
-    box-shadow: 0 0 0 1px var(--yellow), 0 12px 40px #f5c54230;
+    box-shadow: 0 0 0 1px var(--yellow), 0 12px 40px #d4a84330;
   }
 
   .plan-badge {
@@ -288,8 +288,8 @@
     margin-bottom: 16px;
   }
 
-  .badge-free { background: var(--green-dim); color: var(--green); border: 1px solid #00e5a025; }
-  .badge-pro  { background: #f5c54215; color: var(--yellow); border: 1px solid #f5c54230; }
+  .badge-free { background: var(--green-dim); color: var(--green); border: 1px solid #49a07825; }
+  .badge-pro  { background: #d4a84315; color: var(--yellow); border: 1px solid #d4a84330; }
 
   .plan-name {
     font-size: 22px;
@@ -352,7 +352,7 @@
   }
 
   .plan-card.pro .plan-features li::before {
-    background: #f5c54215;
+    background: #d4a84315;
     color: var(--yellow);
   }
 
@@ -429,8 +429,8 @@
 
   .selected-plan-pill:hover { opacity: 0.7; }
 
-  .pill-free { background: var(--green-dim); color: var(--green); border: 1px solid #00e5a025; }
-  .pill-pro  { background: #f5c54215; color: var(--yellow); border: 1px solid #f5c54230; }
+  .pill-free { background: var(--green-dim); color: var(--green); border: 1px solid #49a07825; }
+  .pill-pro  { background: #d4a84315; color: var(--yellow); border: 1px solid #d4a84330; }
 
   .field {
     margin-bottom: 20px;
@@ -563,7 +563,7 @@
     width: 64px;
     height: 64px;
     background: var(--green-dim);
-    border: 1px solid #00e5a030;
+    border: 1px solid #49a07830;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -632,7 +632,7 @@
 
   .key-copy-btn {
     background: var(--accent-glow);
-    border: 1px solid #6c63ff30;
+    border: 1px solid #49a07830;
     color: var(--accent2);
     font-family: var(--mono);
     font-size: 11px;
@@ -650,8 +650,8 @@
   .key-warning {
     display: flex;
     gap: 10px;
-    background: #f5c54210;
-    border: 1px solid #f5c54225;
+    background: #d4a84310;
+    border: 1px solid #d4a84325;
     border-radius: 8px;
     padding: 12px 14px;
     font-size: 12px;

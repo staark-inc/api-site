@@ -7,15 +7,15 @@
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0a0a0f; --bg2: #0f0f18; --bg3: #13131f;
-    --surface: #161625; --surface2: #1c1c2e;
-    --border: #ffffff0d; --border2: #ffffff18;
-    --accent: #6c63ff; --accent2: #8b85ff; --accent-glow: #6c63ff40;
-    --green: #00e5a0; --green-dim: #00e5a015;
-    --red: #ff4d6a; --red-dim: #ff4d6a15;
-    --yellow: #f5c542; --yellow-dim: #f5c54215;
-    --blue: #38b2f4; --blue-dim: #38b2f415;
-    --text: #e8e8f0; --text2: #9090b0; --text3: #5a5a7a;
+    --bg: #1f2421; --bg2: #191e1b; --bg3: #141918;
+    --surface: #243028; --surface2: #2a3830;
+    --border: rgba(73,160,120,0.14); --border2: rgba(73,160,120,0.26);
+    --accent: #49a078; --accent2: #9cc5a1; --accent-glow: #49a07840;
+    --green: #49a078; --green-dim: #49a07815;
+    --red: #e06070; --red-dim: #e0607015;
+    --yellow: #d4a843; --yellow-dim: #d4a84315;
+    --blue: #5a9fd4; --blue-dim: #5a9fd415;
+    --text: #dce1de; --text2: #9cc5a1; --text3: #216869;
     --mono: 'JetBrains Mono', monospace; --sans: 'Syne', sans-serif;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
@@ -30,7 +30,7 @@
   .logo-icon::before { content:''; width:12px; height:12px; border:2.5px solid #fff; border-radius:3px; transform:rotate(15deg); }
   .logo-text { font-size:18px; font-weight:800; letter-spacing:0.08em; color:var(--text); }
   .logo-text span { color:var(--accent2); }
-  .version-badge { margin-top:10px; display:inline-flex; align-items:center; gap:6px; font-family:var(--mono); font-size:10px; color:var(--green); background:var(--green-dim); border:1px solid #00e5a030; padding:3px 8px; border-radius:20px; }
+  .version-badge { margin-top:10px; display:inline-flex; align-items:center; gap:6px; font-family:var(--mono); font-size:10px; color:var(--green); background:var(--green-dim); border:1px solid #49a07830; padding:3px 8px; border-radius:20px; }
   .version-badge::before { content:''; width:5px; height:5px; background:var(--green); border-radius:50%; animation:pulse 2s infinite; }
   @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.3} }
   nav { padding:16px 0; flex:1; }
@@ -87,17 +87,17 @@
   pre { padding:18px; font-family:var(--mono); font-size:12.5px; line-height:1.75; overflow-x:auto; color:var(--text2); }
   .k { color:var(--accent2); } .s { color:var(--green); } .c { color:var(--text3); font-style:italic; } .v { color:var(--yellow); }
 
-  .warning-note { display:flex; gap:12px; background:var(--yellow-dim); border:1px solid #f5c54225; border-radius:10px; padding:14px 18px; font-size:13px; color:var(--text2); line-height:1.6; margin-bottom:20px; }
-  .info-note { display:flex; gap:12px; background:var(--accent-glow); border:1px solid #6c63ff25; border-radius:10px; padding:14px 18px; font-size:13px; color:var(--text2); line-height:1.6; margin-bottom:20px; }
+  .warning-note { display:flex; gap:12px; background:var(--yellow-dim); border:1px solid #d4a84325; border-radius:10px; padding:14px 18px; font-size:13px; color:var(--text2); line-height:1.6; margin-bottom:20px; }
+  .info-note { display:flex; gap:12px; background:var(--accent-glow); border:1px solid #49a07825; border-radius:10px; padding:14px 18px; font-size:13px; color:var(--text2); line-height:1.6; margin-bottom:20px; }
   .note-icon { flex-shrink:0; margin-top:1px; }
 
   .key-anatomy { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:24px; margin-bottom:20px; }
   .key-example { font-family:var(--mono); font-size:15px; color:var(--text); margin-bottom:16px; word-break:break-all; }
   .key-parts { display:flex; gap:0; margin-top:8px; }
   .key-part { padding:6px 12px; font-family:var(--mono); font-size:10px; font-weight:700; text-align:center; }
-  .kp1 { background:var(--accent-glow); color:var(--accent2); border:1px solid #6c63ff25; border-radius:6px 0 0 6px; }
-  .kp2 { background:var(--blue-dim); color:var(--blue); border:1px solid #38b2f420; border-top:1px solid #38b2f420; border-bottom:1px solid #38b2f420; }
-  .kp3 { background:var(--green-dim); color:var(--green); border:1px solid #00e5a025; border-radius:0 6px 6px 0; }
+  .kp1 { background:var(--accent-glow); color:var(--accent2); border:1px solid #49a07825; border-radius:6px 0 0 6px; }
+  .kp2 { background:var(--blue-dim); color:var(--blue); border:1px solid #5a9fd420; border-top:1px solid #5a9fd420; border-bottom:1px solid #5a9fd420; }
+  .kp3 { background:var(--green-dim); color:var(--green); border:1px solid #49a07825; border-radius:0 6px 6px 0; }
   .key-labels { display:flex; margin-top:6px; gap:0; }
   .key-label-item { flex:1; font-size:10px; color:var(--text3); text-align:center; font-family:var(--mono); }
 
@@ -131,18 +131,18 @@
   <button class="mobile-menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰ Menu</button>
   <nav>
     <div class="nav-label">Getting Started</div>
-    <a class="nav-link" href="/"><div class="nav-dot" style="background:#5a5a7a"></div>Introduction</a>
-    <a class="nav-link active" href="/authentication"><div class="nav-dot" style="background:#6c63ff"></div>Authentication</a>
-    <a class="nav-link" href="/rate-limits"><div class="nav-dot" style="background:#5a5a7a"></div>Rate Limits</a>
-    <a class="nav-link" href="/errors"><div class="nav-dot" style="background:#5a5a7a"></div>Errors</a>
+    <a class="nav-link" href="/"><div class="nav-dot" style="background:#216869"></div>Introduction</a>
+    <a class="nav-link active" href="/authentication"><div class="nav-dot" style="background:#49a078"></div>Authentication</a>
+    <a class="nav-link" href="/rate-limits"><div class="nav-dot" style="background:#216869"></div>Rate Limits</a>
+    <a class="nav-link" href="/errors"><div class="nav-dot" style="background:#216869"></div>Errors</a>
     <div class="nav-label">Projects</div>
-    <a class="nav-link" href="/"><div class="nav-dot" style="background:#00e5a0"></div>List Projects<span class="method-tag tag-get">GET</span></a>
-    <a class="nav-link" href="/"><div class="nav-dot" style="background:#38b2f4"></div>Create Project<span class="method-tag tag-post">POST</span></a>
+    <a class="nav-link" href="/"><div class="nav-dot" style="background:#49a078"></div>List Projects<span class="method-tag tag-get">GET</span></a>
+    <a class="nav-link" href="/"><div class="nav-dot" style="background:#5a9fd4"></div>Create Project<span class="method-tag tag-post">POST</span></a>
     <div class="nav-label">Tasks</div>
-    <a class="nav-link" href="/"><div class="nav-dot" style="background:#00e5a0"></div>List Tasks<span class="method-tag tag-get">GET</span></a>
-    <a class="nav-link" href="/"><div class="nav-dot" style="background:#38b2f4"></div>Create Task<span class="method-tag tag-post">POST</span></a>
+    <a class="nav-link" href="/"><div class="nav-dot" style="background:#49a078"></div>List Tasks<span class="method-tag tag-get">GET</span></a>
+    <a class="nav-link" href="/"><div class="nav-dot" style="background:#5a9fd4"></div>Create Task<span class="method-tag tag-post">POST</span></a>
     <div class="nav-label">Webhooks</div>
-    <a class="nav-link" href="/"><div class="nav-dot" style="background:#38b2f4"></div>Register Webhook<span class="method-tag tag-post">POST</span></a>
+    <a class="nav-link" href="/"><div class="nav-dot" style="background:#5a9fd4"></div>Register Webhook<span class="method-tag tag-post">POST</span></a>
   </nav>
 </aside>
 

@@ -7,23 +7,23 @@
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0a0a0f;
-    --bg2: #0f0f18;
-    --surface: #161625;
-    --border: #ffffff0d;
-    --border2: #ffffff18;
-    --accent: #6c63ff;
-    --accent2: #8b85ff;
-    --accent-glow: #6c63ff40;
-    --green: #00e5a0;
-    --green-dim: #00e5a015;
-    --red: #ff4d6a;
-    --red-dim: #ff4d6a15;
-    --yellow: #f5c542;
-    --yellow-dim: #f5c54215;
-    --text: #e8e8f0;
-    --text2: #9090b0;
-    --text3: #5a5a7a;
+    --bg: #1f2421;
+    --bg2: #191e1b;
+    --surface: #243028;
+    --border: rgba(73,160,120,0.14);
+    --border2: rgba(73,160,120,0.26);
+    --accent: #49a078;
+    --accent2: #9cc5a1;
+    --accent-glow: #49a07840;
+    --green: #49a078;
+    --green-dim: #49a07815;
+    --red: #e06070;
+    --red-dim: #e0607015;
+    --yellow: #d4a843;
+    --yellow-dim: #d4a84315;
+    --text: #dce1de;
+    --text2: #9cc5a1;
+    --text3: #216869;
     --mono: 'JetBrains Mono', monospace;
     --sans: 'Syne', sans-serif;
   }
@@ -35,7 +35,7 @@
     position: sticky; top: 0; z-index: 100;
     display: flex; align-items: center; justify-content: space-between;
     padding: 16px 48px;
-    background: #0a0a0fcc; backdrop-filter: blur(12px);
+    background: #1f2421cc; backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border);
   }
 
@@ -79,7 +79,7 @@
   .loading-text { font-family: var(--mono); font-size: 12px; color: var(--text3); }
 
   /* ERROR */
-  .error-state { display: none; align-items: center; gap: 14px; background: var(--red-dim); border: 1px solid #ff4d6a25; border-radius: 10px; padding: 14px 18px; margin-bottom: 24px; }
+  .error-state { display: none; align-items: center; gap: 14px; background: var(--red-dim); border: 1px solid #e0607025; border-radius: 10px; padding: 14px 18px; margin-bottom: 24px; }
   .error-text { font-size: 13px; color: var(--text2); line-height: 1.5; }
   .error-text strong { color: var(--red); }
 
@@ -90,9 +90,9 @@
   .banner-title { font-size: 16px; font-weight: 700; margin-bottom: 2px; }
   .banner-sub { font-size: 12px; color: var(--text2); }
   .banner-time { font-family: var(--mono); font-size: 11px; color: var(--text3); }
-  .banner-ok   { background: var(--green-dim); border-color: #00e5a025; }
-  .banner-deg  { background: var(--yellow-dim); border-color: #f5c54225; }
-  .banner-down { background: var(--red-dim); border-color: #ff4d6a25; }
+  .banner-ok   { background: var(--green-dim); border-color: #49a07825; }
+  .banner-deg  { background: var(--yellow-dim); border-color: #d4a84325; }
+  .banner-down { background: var(--red-dim); border-color: #e0607025; }
 
   /* SECTION LABEL */
   .section-label { font-family: var(--mono); font-size: 9px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text3); margin-bottom: 12px; }
@@ -113,9 +113,9 @@
 
   .status-pill { display: flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 20px; letter-spacing: 0.05em; width: 120px; justify-content: center; }
   .pill-dot { width: 6px; height: 6px; border-radius: 50%; }
-  .status-ok   { background: var(--green-dim); color: var(--green); border: 1px solid #00e5a025; }
-  .status-deg  { background: var(--yellow-dim); color: var(--yellow); border: 1px solid #f5c54225; }
-  .status-down { background: var(--red-dim); color: var(--red); border: 1px solid #ff4d6a25; }
+  .status-ok   { background: var(--green-dim); color: var(--green); border: 1px solid #49a07825; }
+  .status-deg  { background: var(--yellow-dim); color: var(--yellow); border: 1px solid #d4a84325; }
+  .status-down { background: var(--red-dim); color: var(--red); border: 1px solid #e0607025; }
 
   /* UPTIME BARS */
   .uptime-section { margin-bottom: 40px; animation: fadeUp 0.5s 0.2s ease both; }
@@ -145,15 +145,15 @@
   .endpoint-row { display: flex; align-items: center; gap: 14px; padding: 11px 24px; border-bottom: 1px solid var(--border); }
   .endpoint-row:last-child { border-bottom: none; }
   .method { font-family: var(--mono); font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 5px; letter-spacing: 0.04em; width: 54px; text-align: center; flex-shrink: 0; }
-  .method-get    { background: #00e5a015; color: var(--green); border: 1px solid #00e5a025; }
-  .method-post   { background: #6c63ff15; color: var(--accent2); border: 1px solid #6c63ff25; }
-  .method-put    { background: #f5c54215; color: var(--yellow); border: 1px solid #f5c54225; }
-  .method-delete { background: #ff4d6a15; color: var(--red); border: 1px solid #ff4d6a25; }
+  .method-get    { background: #49a07815; color: var(--green); border: 1px solid #49a07825; }
+  .method-post   { background: #49a07815; color: var(--accent2); border: 1px solid #49a07825; }
+  .method-put    { background: #d4a84315; color: var(--yellow); border: 1px solid #d4a84325; }
+  .method-delete { background: #e0607015; color: var(--red); border: 1px solid #e0607025; }
   .endpoint-path { font-family: var(--mono); font-size: 12px; color: var(--text); flex: 1; }
   .endpoint-path span { color: var(--text3); }
   .endpoint-desc { font-size: 12px; color: var(--text3); text-align: right; flex-shrink: 0; width: 200px; }
-  .badge-new { font-family: var(--mono); font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; background: #00e5a018; color: var(--green); border: 1px solid #00e5a030; padding: 2px 6px; border-radius: 4px; flex-shrink: 0; }
-  .badge-auth { font-family: var(--mono); font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; background: #6c63ff10; color: var(--accent2); border: 1px solid #6c63ff20; padding: 2px 6px; border-radius: 4px; flex-shrink: 0; }
+  .badge-new { font-family: var(--mono); font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; background: #49a07818; color: var(--green); border: 1px solid #49a07830; padding: 2px 6px; border-radius: 4px; flex-shrink: 0; }
+  .badge-auth { font-family: var(--mono); font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; background: #49a07810; color: var(--accent2); border: 1px solid #49a07820; padding: 2px 6px; border-radius: 4px; flex-shrink: 0; }
 
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: transparent; }

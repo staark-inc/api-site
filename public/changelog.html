@@ -231,6 +231,7 @@
   .entry:nth-child(2) { animation-delay: 0.15s; }
   .entry:nth-child(3) { animation-delay: 0.2s; }
   .entry:nth-child(4) { animation-delay: 0.25s; }
+  .entry:nth-child(5) { animation-delay: 0.3s; }
 
   .entry-dot {
     position: absolute;
@@ -377,7 +378,8 @@
   <div class="sidebar">
     <div class="sidebar-sticky">
       <div class="sidebar-title">Jump to</div>
-      <a class="sidebar-link active" href="#v142">v1.4.2</a>
+      <a class="sidebar-link active" href="#v150">v1.5.0</a>
+      <a class="sidebar-link" href="#v142">v1.4.2</a>
       <a class="sidebar-link" href="#v141">v1.4.1</a>
       <a class="sidebar-link" href="#v140">v1.4.0</a>
       <a class="sidebar-link" href="#v130">v1.3.0</a>
@@ -392,7 +394,36 @@
 
     <div class="changelog">
 
-      <!-- v1.4.2 -->
+      <!-- v1.5.0 -->
+      <div class="entry" id="v150">
+        <div class="entry-dot" style="background:var(--green)"></div>
+        <div class="entry-meta">
+          <div class="entry-version" style="color:var(--green)">v1.5.0</div>
+          <div class="entry-date">Mar 31, 2026</div>
+        </div>
+        <div class="entry-body">
+          <div class="entry-title">SSH Support, New Design & Auto-Deploy</div>
+          <div class="entry-summary">Major release introducing SSH connection management, a fully redesigned interface with a new color system, and a CI/CD pipeline with automated deployment via GitHub webhooks.</div>
+          <div class="entry-tags">
+            <span class="tag tag-feature">Feature</span>
+            <span class="tag tag-perf">Performance</span>
+            <span class="tag tag-fix">Fix</span>
+          </div>
+          <ul class="entry-changes">
+            <li><span class="change-bullet bullet-feat">feat</span> <code>GET /v1/ssh/connections</code> — list SSH connections</li>
+            <li><span class="change-bullet bullet-feat">feat</span> <code>PUT /v1/ssh/connections/:id</code> — create or update a connection</li>
+            <li><span class="change-bullet bullet-feat">feat</span> <code>DELETE /v1/ssh/connections/:id</code> — remove a connection</li>
+            <li><span class="change-bullet bullet-feat">feat</span> <code>POST /v1/ssh/connections/sync</code> — bulk sync connections</li>
+            <li><span class="change-bullet bullet-feat">feat</span> New SSH panel in dashboard with full CRUD interface</li>
+            <li><span class="change-bullet bullet-feat">feat</span> Auto-deploy via GitHub <code>registry_package</code> webhook on every push to <code>main</code></li>
+            <li><span class="change-bullet bullet-feat">feat</span> CI/CD pipeline with GitHub Actions — build &amp; push to GHCR automatically</li>
+            <li><span class="change-bullet bullet-feat">feat</span> New design system — custom color palette across all public pages</li>
+            <li><span class="change-bullet bullet-fix">fix</span> Corrected endpoint count from 32 to 29 in documentation</li>
+          </ul>
+        </div>
+      </div>
+
+            <!-- v1.4.2 -->
       <div class="entry" id="v142">
         <div class="entry-dot" style="background:var(--green)"></div>
         <div class="entry-meta">

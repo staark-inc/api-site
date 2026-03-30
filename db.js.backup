@@ -1,0 +1,158 @@
+// @ts-nocheck
+/// <reference path="../types/index.d.ts" />
+
+import Database from "better-sqlite3";
+import path from 'path';
+
+const db = new Database("/data/staark.db");
+
+// Performance
+db.pragma('journal_mode = WAL');
+db.pragma('foreign_keys = ON');
+
+// Schema
+db.exec(`
+  CREATE TABLE IF NOT EXISTS status_checks (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    service_name    TEXT    NOT NULL,
+    target          TEXT    NOT NULL,
+    status          TEXT    NOT NULL,
+    latency_ms      INTEGER NOT NULL,
+    http_status     INTEGER,
+    checked_at      TEXT    NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS api_keys (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id     TEXT    NOT NULL,
+    name        TEXT    NOT NULL DEFAULT 'My API Key',
+    key_prefix  TEXT    NOT NULL,          -- sk_live_staark_xxxx (first 24 chars, visible)
+    key_hash    TEXT    NOT NULL UNIQUE,   -- bcrypt hash of full key
+    plan        TEXT    NOT NULL DEFAULT 'free' CHECK(plan IN ('free', 'pro')),
+    expires_at  INTEGER,                   -- unix timestamp, NULL = never
+    last_used   INTEGER,
+    revoked     INTEGER NOT NULL DEFAULT 0,
+    created_at  INTEGER NOT NULL DEFAULT (unixepoch())
+  );
+
+  CREATE TABLE IF NOT EXISTS projects (
+    id            TEXT    PRIMARY KEY,
+    workspace_id  TEXT    NOT NULL,
+    name          TEXT    NOT NULL,
+    description   TEXT,
+    color         TEXT,
+    status        TEXT    NOT NULL DEFAULT 'active'
+                          CHECK(status IN ('active', 'archived', 'completed')),
+    visibility    TEXT    NOT NULL DEFAULT 'private'
+                          CHECK(visibility IN ('private', 'public')),
+    created_at    INTEGER NOT NULL DEFAULT (unixepoch()),
+    updated_at    INTEGER NOT NULL DEFAULT (unixepoch())
+  );
+
+  CREATE TABLE IF NOT EXISTS tasks (
+    id           TEXT    PRIMARY KEY,
+    project_id   TEXT    NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+    title        TEXT    NOT NULL,
+    description  TEXT,
+    status       TEXT    NOT NULL DEFAULT 'todo'
+                         CHECK(status IN ('todo', 'in_progress', 'in_review', 'done')),
+    priority     TEXT    NOT NULL DEFAULT 'medium'
+                         CHECK(priority IN ('low', 'medium', 'high', 'urgent')),
+    assignee_id  TEXT,
+    due_date     TEXT,
+    tags         TEXT    NOT NULL DEFAULT '[]',   -- JSON array
+    created_at   INTEGER NOT NULL DEFAULT (unixepoch()),
+    updated_at   INTEGER NOT NULL DEFAULT (unixepoch())
+  );
+
+  CREATE TABLE IF NOT EXISTS users (
+    id              TEXT    PRIMARY KEY,
+    email           TEXT    NOT NULL UNIQUE,
+    password_hash   TEXT    NOT NULL,
+    first_name      TEXT    NOT NULL,
+    last_name       TEXT    NOT NULL,
+    display_name    TEXT,
+    email_verified  INTEGER NOT NULL DEFAULT 0,
+    created_at      INTEGER NOT NULL DEFAULT (unixepoch()),
+    updated_at      INTEGER NOT NULL DEFAULT (unixepoch())
+  );
+
+  CREATE TABLE IF NOT EXISTS refresh_tokens (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id     TEXT    NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token_hash  TEXT    NOT NULL UNIQUE,
+    expires_at  INTEGER NOT NULL,
+    created_at  INTEGER NOT NULL DEFAULT (unixepoch())
+  );
+
+  CREATE TABLE IF NOT EXISTS email_tokens (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id     TEXT    NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token_hash  TEXT    NOT NULL UNIQUE,
+    type        TEXT    NOT NULL CHECK(type IN ('verify_email', 'reset_password')),
+    expires_at  INTEGER NOT NULL,
+    created_at  INTEGER NOT NULL DEFAULT (unixepoch())
+  );
+
+  CREATE TABLE IF NOT EXISTS workspaces (
+    id          TEXT    PRIMARY KEY,
+    user_id     TEXT    NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    name        TEXT    NOT NULL,
+    created_at  INTEGER NOT NULL DEFAULT (unixepoch()),
+    updated_at  INTEGER NOT NULL DEFAULT (unixepoch())
+  );
+  
+  CREATE INDEX IF NOT EXISTS idx_workspaces_user ON workspaces(user_id);
+  CREATE INDEX IF NOT EXISTS idx_tasks_project  ON tasks(project_id);
+  CREATE INDEX IF NOT EXISTS idx_tasks_status   ON tasks(status);
+  CREATE INDEX IF NOT EXISTS idx_tasks_assignee ON tasks(assignee_id);
+  CREATE INDEX IF NOT EXISTS idx_projects_workspace ON projects(workspace_id);
+  CREATE INDEX IF NOT EXISTS idx_projects_status    ON projects(status);
+  CREATE INDEX IF NOT EXISTS idx_keys_user    ON api_keys(user_id);
+  CREATE INDEX IF NOT EXISTS idx_keys_prefix  ON api_keys(key_prefix);
+  CREATE INDEX IF NOT EXISTS idx_keys_hash    ON api_keys(key_hash);
+  CREATE INDEX IF NOT EXISTS idx_users_email          ON users(email);
+  CREATE INDEX IF NOT EXISTS idx_refresh_tokens_user  ON refresh_tokens(user_id);
+  CREATE INDEX IF NOT EXISTS idx_email_tokens_user    ON email_tokens(user_id);
+`);
+
+const insertStatus = db.prepare(`
+  INSERT INTO status_checks
+  (service_name, target, status, latency_ms, http_status, checked_at)
+  VALUES (?, ?, ?, ?, ?, ?)
+`);
+
+function saveCheck(service) {
+  insertStatus.run(
+    service.name,
+    service.target,
+    service.status,
+    service.latencyMs ?? 0,
+    service.httpStatus ?? null,
+    new Date().toISOString()
+  );
+}
+
+function getDailyHistory(days = 90) {
+  return db.prepare(`
+    SELECT
+      service_name,
+      substr(checked_at, 1, 10) AS day,
+      COUNT(*) AS total_checks,
+      SUM(CASE WHEN status = 'Operational' THEN 1 ELSE 0 END) AS ok_checks,
+      ROUND(
+        (SUM(CASE WHEN status = 'Operational' THEN 1 ELSE 0 END) * 100.0) / COUNT(*),
+        2
+      ) AS uptime_percent
+    FROM status_checks
+    WHERE checked_at >= datetime('now', '-' || ? || ' days')
+    GROUP BY service_name, day
+    ORDER BY day ASC
+  `).all(days);
+}
+
+export {
+  db as default,
+  saveCheck,
+  getDailyHistory,
+};

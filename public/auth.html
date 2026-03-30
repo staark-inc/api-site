@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Staark API — Authentication</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f; --bg2: #0f0f18; --bg3: #13131f;
+    --surface: #161625; --surface2: #1c1c2e;
+    --border: #ffffff0d; --border2: #ffffff18;
+    --accent: #6c63ff; --accent2: #8b85ff; --accent-glow: #6c63ff40;
+    --green: #00e5a0; --green-dim: #00e5a015;
+    --red: #ff4d6a; --red-dim: #ff4d6a15;
+    --yellow: #f5c542; --yellow-dim: #f5c54215;
+    --blue: #38b2f4; --blue-dim: #38b2f415;
+    --text: #e8e8f0; --text2: #9090b0; --text3: #5a5a7a;
+    --mono: 'JetBrains Mono', monospace; --sans: 'Syne', sans-serif;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior: smooth; }
+  body { background:var(--bg); color:var(--text); font-family:var(--sans); display:flex; min-height:100vh; }
+
+  /* SIDEBAR */
+  aside { width:260px; min-width:260px; background:var(--bg2); border-right:1px solid var(--border); display:flex; flex-direction:column; position:sticky; top:0; height:100vh; overflow-y:auto; }
+  .logo { padding:28px 24px 20px; border-bottom:1px solid var(--border); }
+  .logo-mark { display:flex; align-items:center; gap:10px; text-decoration:none; }
+  .logo-icon { width:32px; height:32px; background:var(--accent); border-radius:8px; display:flex; align-items:center; justify-content:center; box-shadow:0 0 20px var(--accent-glow); }
+  .logo-icon::before { content:''; width:12px; height:12px; border:2.5px solid #fff; border-radius:3px; transform:rotate(15deg); }
+  .logo-text { font-size:18px; font-weight:800; letter-spacing:0.08em; color:var(--text); }
+  .logo-text span { color:var(--accent2); }
+  .version-badge { margin-top:10px; display:inline-flex; align-items:center; gap:6px; font-family:var(--mono); font-size:10px; color:var(--green); background:var(--green-dim); border:1px solid #00e5a030; padding:3px 8px; border-radius:20px; }
+  .version-badge::before { content:''; width:5px; height:5px; background:var(--green); border-radius:50%; animation:pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.3} }
+  nav { padding:16px 0; flex:1; }
+  .nav-label { font-family:var(--mono); font-size:9px; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:var(--text3); padding:12px 24px 6px; }
+  .nav-link { display:flex; align-items:center; gap:10px; padding:8px 24px; font-size:13px; font-weight:500; color:var(--text2); text-decoration:none; transition:all 0.15s; border-left:2px solid transparent; margin:0 0 1px; cursor:pointer; }
+  .nav-link:hover { color:var(--text); background:var(--border); }
+  .nav-link.active { color:var(--accent2); background:var(--accent-glow); border-left-color:var(--accent); }
+  .nav-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+  .method-tag { font-family:var(--mono); font-size:9px; font-weight:700; padding:2px 6px; border-radius:4px; letter-spacing:0.05em; margin-left:auto; }
+  .tag-get { background:var(--green-dim); color:var(--green); }
+  .tag-post { background:var(--blue-dim); color:var(--blue); }
+  .tag-put { background:var(--yellow-dim); color:var(--yellow); }
+  .tag-delete { background:var(--red-dim); color:var(--red); }
+
+  /* TOPBAR */
+  .topbar { position:fixed; top:0; left:260px; right:0; height:52px; background:var(--bg2); border-bottom:1px solid var(--border); display:flex; align-items:center; padding:0 48px; z-index:100; gap:16px; }
+  .search-bar { display:flex; align-items:center; gap:10px; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:6px 14px; width:280px; }
+  .search-bar input { background:none; border:none; outline:none; font-family:var(--mono); font-size:12px; color:var(--text); width:100%; }
+  .search-bar input::placeholder { color:var(--text3); }
+  .topbar-links { display:flex; gap:4px; margin-left:auto; }
+  .topbar-link { font-size:12px; color:var(--text2); padding:5px 12px; border-radius:6px; cursor:pointer; transition:all 0.15s; font-weight:500; text-decoration:none; }
+  .topbar-link:hover { color:var(--text); background:var(--border); }
+  .topbar-cta { font-size:12px; color:#fff; background:var(--accent); padding:6px 14px; border-radius:6px; cursor:pointer; font-weight:600; transition:all 0.15s; text-decoration:none; box-shadow:0 0 16px var(--accent-glow); }
+  .topbar-cta:hover { background:var(--accent2); }
+
+  /* MAIN */
+  main { flex:1; overflow-y:auto; max-width:860px; padding:80px 56px 80px; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)} }
+
+  .page-eyebrow { font-family:var(--mono); font-size:11px; letter-spacing:0.2em; color:var(--accent2); text-transform:uppercase; margin-bottom:12px; animation:fadeUp 0.5s ease both; }
+  h1 { font-size:42px; font-weight:800; letter-spacing:-0.02em; margin-bottom:14px; background:linear-gradient(135deg,#fff 0%,#9090c0 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; animation:fadeUp 0.5s 0.05s ease both; }
+  .page-desc { font-size:15px; color:var(--text2); line-height:1.7; margin-bottom:48px; animation:fadeUp 0.5s 0.1s ease both; }
+
+  .section { margin-bottom:56px; animation:fadeUp 0.5s ease both; }
+  h2 { font-size:22px; font-weight:700; letter-spacing:-0.01em; margin-bottom:20px; color:var(--text); display:flex; align-items:center; gap:12px; }
+  h2::before { content:''; display:block; width:3px; height:22px; background:var(--accent); border-radius:2px; }
+
+  .info-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:28px; margin-bottom:20px; }
+  .info-card p { font-size:14px; color:var(--text2); line-height:1.7; margin-bottom:16px; }
+  .info-card p:last-child { margin-bottom:0; }
+
+  .step-list { display:flex; flex-direction:column; gap:16px; margin-bottom:24px; }
+  .step { display:flex; gap:16px; align-items:flex-start; }
+  .step-num { font-family:var(--mono); font-size:11px; font-weight:700; color:var(--accent2); background:var(--accent-glow); width:26px; height:26px; border-radius:6px; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
+  .step-content { flex:1; }
+  .step-title { font-size:14px; font-weight:700; color:var(--text); margin-bottom:4px; }
+  .step-desc { font-size:13px; color:var(--text2); line-height:1.6; }
+
+  .code-block { background:var(--bg); border:1px solid var(--border); border-radius:10px; overflow:hidden; margin-bottom:16px; }
+  .code-header { display:flex; align-items:center; justify-content:space-between; padding:10px 16px; border-bottom:1px solid var(--border); }
+  .code-lang { font-family:var(--mono); font-size:9px; color:var(--text3); letter-spacing:0.1em; text-transform:uppercase; }
+  .code-copy { font-family:var(--mono); font-size:9px; color:var(--text3); background:none; border:1px solid var(--border2); padding:2px 8px; border-radius:4px; cursor:pointer; transition:all 0.15s; }
+  .code-copy:hover { color:var(--text); border-color:var(--accent); }
+  pre { padding:18px; font-family:var(--mono); font-size:12.5px; line-height:1.75; overflow-x:auto; color:var(--text2); }
+  .k { color:var(--accent2); } .s { color:var(--green); } .c { color:var(--text3); font-style:italic; } .v { color:var(--yellow); }
+
+  .warning-note { display:flex; gap:12px; background:var(--yellow-dim); border:1px solid #f5c54225; border-radius:10px; padding:14px 18px; font-size:13px; color:var(--text2); line-height:1.6; margin-bottom:20px; }
+  .info-note { display:flex; gap:12px; background:var(--accent-glow); border:1px solid #6c63ff25; border-radius:10px; padding:14px 18px; font-size:13px; color:var(--text2); line-height:1.6; margin-bottom:20px; }
+  .note-icon { flex-shrink:0; margin-top:1px; }
+
+  .key-anatomy { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:24px; margin-bottom:20px; }
+  .key-example { font-family:var(--mono); font-size:15px; color:var(--text); margin-bottom:16px; word-break:break-all; }
+  .key-parts { display:flex; gap:0; margin-top:8px; }
+  .key-part { padding:6px 12px; font-family:var(--mono); font-size:10px; font-weight:700; text-align:center; }
+  .kp1 { background:var(--accent-glow); color:var(--accent2); border:1px solid #6c63ff25; border-radius:6px 0 0 6px; }
+  .kp2 { background:var(--blue-dim); color:var(--blue); border:1px solid #38b2f420; border-top:1px solid #38b2f420; border-bottom:1px solid #38b2f420; }
+  .kp3 { background:var(--green-dim); color:var(--green); border:1px solid #00e5a025; border-radius:0 6px 6px 0; }
+  .key-labels { display:flex; margin-top:6px; gap:0; }
+  .key-label-item { flex:1; font-size:10px; color:var(--text3); text-align:center; font-family:var(--mono); }
+
+  code { font-family:var(--mono); font-size:11px; color:var(--accent2); background:var(--accent-glow); padding:1px 5px; border-radius:3px; }
+
+  /* MOBILE */
+  .mobile-menu-btn { display:none; }
+  @media (max-width: 768px) {
+    body { flex-direction:column; }
+    aside { width:100%; min-width:unset; height:auto; position:relative; border-right:none; border-bottom:1px solid var(--border); }
+    aside nav { display:none; }
+    aside.open nav { display:block; }
+    .mobile-menu-btn { display:flex; align-items:center; gap:8px; font-size:12px; font-weight:600; color:var(--text2); background:none; border:1px solid var(--border2); padding:6px 12px; border-radius:6px; cursor:pointer; margin:12px 24px; font-family:var(--sans); }
+    .topbar { left:0; position:relative; padding:0 20px; }
+    .search-bar { width:100%; }
+    .topbar-links { display:none; }
+    main { padding:32px 20px 60px; max-width:100%; }
+    h1 { font-size:30px; }
+  }
+
+  ::-webkit-scrollbar { width:4px; } ::-webkit-scrollbar-track { background:transparent; } ::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
+</style>
+</head>
+<body>
+
+<aside id="sidebar">
+  <div class="logo">
+    <a class="logo-mark" href="/"><div class="logo-icon"></div><span class="logo-text">STAARK<span>.</span></span></a>
+    <div class="version-badge">v1.4.2 — stable</div>
+  </div>
+  <button class="mobile-menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰ Menu</button>
+  <nav>
+    <div class="nav-label">Getting Started</div>
+    <a class="nav-link" href="/"><div class="nav-dot" style="background:#5a5a7a"></div>Introduction</a>
+    <a class="nav-link active" href="/authentication"><div class="nav-dot" style="background:#6c63ff"></div>Authentication</a>
+    <a class="nav-link" href="/rate-limits"><div class="nav-dot" style="background:#5a5a7a"></div>Rate Limits</a>
+    <a class="nav-link" href="/errors"><div class="nav-dot" style="background:#5a5a7a"></div>Errors</a>
+    <div class="nav-label">Projects</div>
+    <a class="nav-link" href="/"><div class="nav-dot" style="background:#00e5a0"></div>List Projects<span class="method-tag tag-get">GET</span></a>
+    <a class="nav-link" href="/"><div class="nav-dot" style="background:#38b2f4"></div>Create Project<span class="method-tag tag-post">POST</span></a>
+    <div class="nav-label">Tasks</div>
+    <a class="nav-link" href="/"><div class="nav-dot" style="background:#00e5a0"></div>List Tasks<span class="method-tag tag-get">GET</span></a>
+    <a class="nav-link" href="/"><div class="nav-dot" style="background:#38b2f4"></div>Create Task<span class="method-tag tag-post">POST</span></a>
+    <div class="nav-label">Webhooks</div>
+    <a class="nav-link" href="/"><div class="nav-dot" style="background:#38b2f4"></div>Register Webhook<span class="method-tag tag-post">POST</span></a>
+  </nav>
+</aside>
+
+<div class="topbar">
+  <div class="search-bar"><span style="color:var(--text3)">⌕</span><input type="text" placeholder="Search endpoints..."></div>
+  <div class="topbar-links">
+    <a class="topbar-link" href="/changelog">Changelog</a>
+    <a class="topbar-link" href="/sdks">SDKs</a>
+    <a class="topbar-link" href="/status">Status</a>
+  </div>
+  <a class="topbar-cta" href="/v1/get-key">Get API Key →</a>
+</div>
+
+<main>
+  <div class="page-eyebrow">Getting Started</div>
+  <h1>Authentication</h1>
+  <p class="page-desc">The Staark API uses API keys to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP will fail.</p>
+
+  <!-- HOW IT WORKS -->
+  <div class="section">
+    <h2>How it works</h2>
+    <div class="info-card">
+      <p>Every request to the Staark API must include your API key in the <code>Authorization</code> header using the Bearer scheme. Keys are scoped to a workspace and carry the permissions of the user who generated them.</p>
+      <p>API keys are prefixed with <code>sk_live_staark_</code> for production keys. Keep them secure — they provide full access to your workspace.</p>
+    </div>
+
+    <div class="key-anatomy">
+      <div style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:10px">Key anatomy</div>
+      <div class="key-example">sk_live_staark_a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6</div>
+      <div class="key-parts">
+        <div class="key-part kp1">sk_live_</div>
+        <div class="key-part kp2">staark_</div>
+        <div class="key-part kp3">a1b2c3d4...n4o5p6</div>
+      </div>
+      <div class="key-labels">
+        <div class="key-label-item">environment</div>
+        <div class="key-label-item">prefix</div>
+        <div class="key-label-item">32-char random token</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- USAGE -->
+  <div class="section">
+    <h2>Making authenticated requests</h2>
+    <div class="step-list">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">Generate an API key</div>
+          <div class="step-desc">Go to <a href="/v1/get-key" style="color:var(--accent2);text-decoration:none">/v1/get-key</a>, choose your plan, and generate a key. It will only be shown once.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">Store it as an environment variable</div>
+          <div class="step-desc">Never hard-code your key in source code. Use environment variables or a secrets manager.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">Include it in the Authorization header</div>
+          <div class="step-desc">Pass the key as a Bearer token on every request.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">HTTP Header</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+      <pre><span class="k">Authorization</span>: Bearer <span class="s">sk_live_staark_••••••••••••••••</span></pre>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">cURL</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+      <pre><span class="k">curl</span> https://api.staark-app.cloud/v1/projects \
+  -H <span class="s">"Authorization: Bearer sk_live_staark_••••••••"</span> \
+  -H <span class="s">"Content-Type: application/json"</span></pre>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Node.js</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+      <pre><span class="k">const</span> res = <span class="k">await</span> fetch(<span class="s">'https://api.staark-app.cloud/v1/projects'</span>, {
+  headers: {
+    <span class="s">'Authorization'</span>: <span class="s">`Bearer </span><span class="v">${process.env.STAARK_API_KEY}</span><span class="s">`</span>,
+    <span class="s">'Content-Type'</span>: <span class="s">'application/json'</span>,
+  }
+});</pre>
+    </div>
+  </div>
+
+  <!-- SECURITY -->
+  <div class="section">
+    <h2>Security best practices</h2>
+    <div class="warning-note">
+      <span class="note-icon">⚠</span>
+      <div>Your API key grants full access to your workspace. Treat it like a password — never expose it in client-side code, public repos, or logs.</div>
+    </div>
+    <div class="info-card">
+      <div class="step-list">
+        <div class="step"><div class="step-num">✓</div><div class="step-content"><div class="step-title">Use environment variables</div><div class="step-desc">Store keys in <code>.env</code> files and load them via <code>process.env</code>. Add <code>.env</code> to your <code>.gitignore</code>.</div></div></div>
+        <div class="step"><div class="step-num">✓</div><div class="step-content"><div class="step-title">Rotate keys regularly</div><div class="step-desc">Generate a new key periodically and revoke old ones from the dashboard.</div></div></div>
+        <div class="step"><div class="step-num">✓</div><div class="step-content"><div class="step-title">Never expose in frontend code</div><div class="step-desc">API calls with your key should always go through your backend, never from the browser directly.</div></div></div>
+        <div class="step"><div class="step-num">✓</div><div class="step-content"><div class="step-title">Use HTTPS only</div><div class="step-desc">All requests must use HTTPS. HTTP requests will be rejected with a <code>403</code> error.</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ERRORS -->
+  <div class="section">
+    <h2>Authentication errors</h2>
+    <div class="info-card">
+      <p>If your request is not authenticated correctly, you will receive a <code>401 Unauthorized</code> response:</p>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">JSON — 401 Response</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+      <pre>{
+  <span class="k">"error"</span>: {
+    <span class="k">"code"</span>: <span class="s">"UNAUTHORIZED"</span>,
+    <span class="k">"message"</span>: <span class="s">"Invalid or missing API key"</span>,
+    <span class="k">"docs"</span>: <span class="s">"https://api.staark-app.cloud/authentication"</span>
+  }
+}</pre>
+    </div>
+  </div>
+</main>
+
+<script>
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    btn.textContent = 'Copied!';
+    btn.style.color = 'var(--green)';
+    setTimeout(() => { btn.textContent = 'Copy'; btn.style.color = ''; }, 1800);
+  });
+}
+</script>
+</body>
+</html>

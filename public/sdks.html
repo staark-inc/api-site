@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Staark API — SDKs</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --bg2: #0f0f18;
+    --surface: #161625;
+    --border: #ffffff0d;
+    --border2: #ffffff18;
+    --accent: #6c63ff;
+    --accent2: #8b85ff;
+    --accent-glow: #6c63ff40;
+    --green: #00e5a0;
+    --green-dim: #00e5a015;
+    --yellow: #f5c542;
+    --yellow-dim: #f5c54215;
+    --blue: #38b2f4;
+    --blue-dim: #38b2f415;
+    --red: #ff4d6a;
+    --red-dim: #ff4d6a15;
+    --text: #e8e8f0;
+    --text2: #9090b0;
+    --text3: #5a5a7a;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Syne', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+  }
+
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 48px;
+    background: #0a0a0fcc;
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo-mark {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
+
+  .logo-icon {
+    width: 30px;
+    height: 30px;
+    background: var(--accent);
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 16px var(--accent-glow);
+  }
+
+  .logo-icon::before {
+    content: '';
+    width: 11px;
+    height: 11px;
+    border: 2px solid #fff;
+    border-radius: 3px;
+    transform: rotate(15deg);
+  }
+
+  .logo-text {
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: var(--text);
+  }
+
+  .logo-text span { color: var(--accent2); }
+
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .nav-link {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text2);
+    text-decoration: none;
+    padding: 6px 14px;
+    border-radius: 6px;
+    transition: all 0.15s;
+  }
+
+  .nav-link:hover { color: var(--text); background: var(--border); }
+  .nav-link.active { color: var(--accent2); }
+
+  .nav-cta {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    background: var(--accent);
+    text-decoration: none;
+    padding: 7px 16px;
+    border-radius: 7px;
+    transition: all 0.15s;
+    box-shadow: 0 0 16px var(--accent-glow);
+    margin-left: 4px;
+  }
+
+  .nav-cta:hover { background: var(--accent2); }
+
+  .layout {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 64px 48px;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .page-eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--accent2);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  h1 {
+    font-size: 42px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #fff 0%, #9090c0 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: fadeUp 0.5s 0.05s ease both;
+  }
+
+  .page-desc {
+    font-size: 15px;
+    color: var(--text2);
+    line-height: 1.6;
+    margin-bottom: 48px;
+    animation: fadeUp 0.5s 0.1s ease both;
+  }
+
+  /* SDK GRID */
+  .sdk-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 56px;
+    animation: fadeUp 0.5s 0.15s ease both;
+  }
+
+  .sdk-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px 24px;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+
+  .sdk-card:hover {
+    border-color: var(--border2);
+    transform: translateY(-3px);
+    box-shadow: 0 16px 40px #00000050;
+  }
+
+  .sdk-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .sdk-name {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .sdk-version {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text3);
+    margin-top: -10px;
+  }
+
+  .sdk-desc {
+    font-size: 12px;
+    color: var(--text2);
+    line-height: 1.5;
+    flex: 1;
+  }
+
+  .sdk-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .sdk-badge {
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 20px;
+    letter-spacing: 0.05em;
+  }
+
+  .badge-official { background: var(--green-dim); color: var(--green); border: 1px solid #00e5a025; }
+  .badge-community { background: var(--yellow-dim); color: var(--yellow); border: 1px solid #f5c54225; }
+  .badge-soon { background: var(--border); color: var(--text3); border: 1px solid var(--border2); }
+
+  .sdk-arrow {
+    font-size: 14px;
+    color: var(--text3);
+    transition: all 0.2s;
+  }
+
+  .sdk-card:hover .sdk-arrow {
+    color: var(--accent2);
+    transform: translateX(3px);
+  }
+
+  /* INSTALL SECTION */
+  .section-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 16px;
+    animation: fadeUp 0.5s 0.2s ease both;
+  }
+
+  .install-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 0;
+    animation: fadeUp 0.5s 0.22s ease both;
+  }
+
+  .tab {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 7px 16px;
+    border-radius: 8px 8px 0 0;
+    border: 1px solid var(--border);
+    border-bottom: none;
+    background: var(--bg2);
+    color: var(--text3);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .tab.active {
+    background: var(--surface);
+    color: var(--text);
+    border-color: var(--border2);
+  }
+
+  .install-block {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 0 10px 10px 10px;
+    overflow: hidden;
+    margin-bottom: 48px;
+    animation: fadeUp 0.5s 0.25s ease both;
+  }
+
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .code-lang {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text3);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .code-copy {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text3);
+    background: none;
+    border: 1px solid var(--border2);
+    padding: 2px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .code-copy:hover { color: var(--text); border-color: var(--accent); }
+
+  pre {
+    padding: 18px;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.7;
+    overflow-x: auto;
+    color: var(--text2);
+  }
+
+  .k { color: var(--accent2); }
+  .s { color: var(--green); }
+  .c { color: var(--text3); font-style: italic; }
+
+  .install-content { display: none; }
+  .install-content.active { display: block; }
+
+  /* INFO NOTE */
+  .info-note {
+    display: flex;
+    gap: 12px;
+    background: var(--accent-glow);
+    border: 1px solid #6c63ff25;
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.6;
+    animation: fadeUp 0.5s 0.3s ease both;
+  }
+
+  .info-icon { color: var(--accent2); flex-shrink: 0; }
+
+  code {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent2);
+    background: var(--accent-glow);
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="logo-mark" href="/">
+    <div class="logo-icon"></div>
+    <span class="logo-text">STAARK<span>.</span></span>
+  </a>
+  <div class="nav-right">
+    <a class="nav-link" href="/changelog">Changelog</a>
+    <a class="nav-link active" href="/sdks">SDKs</a>
+    <a class="nav-link" href="/status">Status</a>
+    <a class="nav-cta" href="/v1/get-key">Get API Key →</a>
+  </div>
+</nav>
+
+<div class="layout">
+
+  <div class="page-eyebrow">Client Libraries</div>
+  <h1>SDKs</h1>
+  <p class="page-desc">Official and community-maintained clients for the Staark API. Get up and running in minutes.</p>
+
+  <!-- SDK CARDS -->
+  <div class="sdk-grid">
+
+    <div class="sdk-card" onclick="switchTab('node')">
+      <div class="sdk-icon" style="background:var(--green-dim);color:var(--green)">JS</div>
+      <div>
+        <div class="sdk-name">Node.js</div>
+        <div class="sdk-version">staark-node · v2.1.0</div>
+      </div>
+      <div class="sdk-desc">Full TypeScript support. Works with Node 18+ and all major runtimes including Bun and Deno.</div>
+      <div class="sdk-footer">
+        <span class="sdk-badge badge-official">Official</span>
+        <span class="sdk-arrow">→</span>
+      </div>
+    </div>
+
+    <div class="sdk-card" onclick="switchTab('python')">
+      <div class="sdk-icon" style="background:var(--blue-dim);color:var(--blue)">PY</div>
+      <div>
+        <div class="sdk-name">Python</div>
+        <div class="sdk-version">staark-python · v1.8.2</div>
+      </div>
+      <div class="sdk-desc">Async-first with <code>asyncio</code> support. Compatible with Python 3.9+. Includes type hints.</div>
+      <div class="sdk-footer">
+        <span class="sdk-badge badge-official">Official</span>
+        <span class="sdk-arrow">→</span>
+      </div>
+    </div>
+
+    <div class="sdk-card" onclick="switchTab('go')">
+      <div class="sdk-icon" style="background:#00acd715;color:#00acd7">GO</div>
+      <div>
+        <div class="sdk-name">Go</div>
+        <div class="sdk-version">staark-go · v1.2.0</div>
+      </div>
+      <div class="sdk-desc">Idiomatic Go client with context support and automatic retries on transient errors.</div>
+      <div class="sdk-footer">
+        <span class="sdk-badge badge-official">Official</span>
+        <span class="sdk-arrow">→</span>
+      </div>
+    </div>
+
+    <div class="sdk-card">
+      <div class="sdk-icon" style="background:#e3342f15;color:#e3342f">RB</div>
+      <div>
+        <div class="sdk-name">Ruby</div>
+        <div class="sdk-version">staark-ruby · v0.9.1</div>
+      </div>
+      <div class="sdk-desc">Community-maintained gem. Works with Rails and plain Ruby projects.</div>
+      <div class="sdk-footer">
+        <span class="sdk-badge badge-community">Community</span>
+        <span class="sdk-arrow">→</span>
+      </div>
+    </div>
+
+    <div class="sdk-card">
+      <div class="sdk-icon" style="background:#512bd415;color:#9b72cf">C#</div>
+      <div>
+        <div class="sdk-name">.NET</div>
+        <div class="sdk-version">Staark.NET · v0.6.0</div>
+      </div>
+      <div class="sdk-desc">Community client for .NET 6+ with NuGet package support.</div>
+      <div class="sdk-footer">
+        <span class="sdk-badge badge-community">Community</span>
+        <span class="sdk-arrow">→</span>
+      </div>
+    </div>
+
+    <div class="sdk-card" style="opacity:0.5;cursor:default">
+      <div class="sdk-icon" style="background:var(--border);color:var(--text3)">PH</div>
+      <div>
+        <div class="sdk-name">PHP</div>
+        <div class="sdk-version">Coming soon</div>
+      </div>
+      <div class="sdk-desc">Official PHP client in development. Expected Q2 2026.</div>
+      <div class="sdk-footer">
+        <span class="sdk-badge badge-soon">Soon</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- INSTALL -->
+  <div class="section-label">Quick Install</div>
+
+  <div class="install-tabs">
+    <div class="tab active" onclick="switchTab('node')" id="tab-node">Node.js</div>
+    <div class="tab" onclick="switchTab('python')" id="tab-python">Python</div>
+    <div class="tab" onclick="switchTab('go')" id="tab-go">Go</div>
+  </div>
+
+  <div class="install-block">
+    <div class="install-content active" id="content-node">
+      <div class="code-header">
+        <span class="code-lang">Terminal</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><span class="k">npm</span> install staark-node</pre>
+      <div class="code-header" style="border-top:1px solid var(--border)">
+        <span class="code-lang">JavaScript</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><span class="k">import</span> { Staark } <span class="k">from</span> <span class="s">'staark-node'</span>;
+
+<span class="k">const</span> client = <span class="k">new</span> Staark({
+  apiKey: process.env.<span class="s">STAARK_API_KEY</span>,
+});
+
+<span class="k">const</span> projects = <span class="k">await</span> client.projects.list();
+console.log(projects);</pre>
+    </div>
+
+    <div class="install-content" id="content-python">
+      <div class="code-header">
+        <span class="code-lang">Terminal</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><span class="k">pip</span> install staark-python</pre>
+      <div class="code-header" style="border-top:1px solid var(--border)">
+        <span class="code-lang">Python</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><span class="k">from</span> staark <span class="k">import</span> Staark
+<span class="k">import</span> asyncio
+
+client = Staark(api_key=<span class="s">"sk_live_staark_••••"</span>)
+
+<span class="k">async def</span> main():
+    projects = <span class="k">await</span> client.projects.list()
+    print(projects)
+
+asyncio.run(main())</pre>
+    </div>
+
+    <div class="install-content" id="content-go">
+      <div class="code-header">
+        <span class="code-lang">Terminal</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><span class="k">go</span> get github.com/staark-app/staark-go</pre>
+      <div class="code-header" style="border-top:1px solid var(--border)">
+        <span class="code-lang">Go</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><span class="k">import</span> <span class="s">"github.com/staark-app/staark-go"</span>
+
+client := staark.New(<span class="s">"sk_live_staark_••••"</span>)
+projects, err := client.Projects.List(ctx)
+<span class="k">if</span> err != <span class="k">nil</span> { log.Fatal(err) }
+fmt.Println(projects)</pre>
+    </div>
+  </div>
+
+  <div class="info-note">
+    <span class="info-icon">ℹ</span>
+    All official SDKs are open source on <a href="#" style="color:var(--accent2);text-decoration:none">GitHub</a>. 
+    To add a community SDK, open a pull request on the <code>staark-app/community</code> repo.
+  </div>
+
+</div>
+
+<script>
+function switchTab(lang) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.install-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-' + lang).classList.add('active');
+  document.getElementById('content-' + lang).classList.add('active');
+}
+
+function copyCode(btn) {
+  const pre = btn.closest('.code-header').nextElementSibling;
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    btn.textContent = 'Copied!';
+    btn.style.color = 'var(--green)';
+    btn.style.borderColor = 'var(--green)';
+    setTimeout(() => { btn.textContent = 'Copy'; btn.style.color = ''; btn.style.borderColor = ''; }, 1800);
+  });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Staark API — Changelog</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --bg2: #0f0f18;
+    --surface: #161625;
+    --border: #ffffff0d;
+    --border2: #ffffff18;
+    --accent: #6c63ff;
+    --accent2: #8b85ff;
+    --accent-glow: #6c63ff40;
+    --green: #00e5a0;
+    --green-dim: #00e5a015;
+    --red: #ff4d6a;
+    --red-dim: #ff4d6a15;
+    --yellow: #f5c542;
+    --yellow-dim: #f5c54215;
+    --blue: #38b2f4;
+    --text: #e8e8f0;
+    --text2: #9090b0;
+    --text3: #5a5a7a;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Syne', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+  }
+
+  /* NAV */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 48px;
+    background: #0a0a0fcc;
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo-mark {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
+
+  .logo-icon {
+    width: 30px;
+    height: 30px;
+    background: var(--accent);
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 16px var(--accent-glow);
+  }
+
+  .logo-icon::before {
+    content: '';
+    width: 11px;
+    height: 11px;
+    border: 2px solid #fff;
+    border-radius: 3px;
+    transform: rotate(15deg);
+  }
+
+  .logo-text {
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: var(--text);
+  }
+
+  .logo-text span { color: var(--accent2); }
+
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .nav-link {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text2);
+    text-decoration: none;
+    padding: 6px 14px;
+    border-radius: 6px;
+    transition: all 0.15s;
+  }
+
+  .nav-link:hover { color: var(--text); background: var(--border); }
+  .nav-link.active { color: var(--accent2); }
+
+  .nav-cta {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    background: var(--accent);
+    text-decoration: none;
+    padding: 7px 16px;
+    border-radius: 7px;
+    transition: all 0.15s;
+    box-shadow: 0 0 16px var(--accent-glow);
+    margin-left: 4px;
+  }
+
+  .nav-cta:hover { background: var(--accent2); }
+
+  /* LAYOUT */
+  .layout {
+    display: flex;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 64px 48px;
+    gap: 64px;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 200px;
+    flex-shrink: 0;
+  }
+
+  .sidebar-sticky {
+    position: sticky;
+    top: 88px;
+  }
+
+  .sidebar-title {
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 12px;
+  }
+
+  .sidebar-link {
+    display: block;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text2);
+    text-decoration: none;
+    padding: 6px 10px;
+    border-left: 2px solid transparent;
+    margin-bottom: 2px;
+    transition: all 0.15s;
+    border-radius: 0 4px 4px 0;
+  }
+
+  .sidebar-link:hover { color: var(--text); background: var(--border); }
+  .sidebar-link.active { color: var(--accent2); border-left-color: var(--accent); background: var(--accent-glow); }
+
+  /* MAIN */
+  main { flex: 1; min-width: 0; }
+
+  .page-eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--accent2);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  h1 {
+    font-size: 42px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #fff 0%, #9090c0 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: fadeUp 0.5s 0.05s ease both;
+  }
+
+  .page-desc {
+    font-size: 15px;
+    color: var(--text2);
+    line-height: 1.6;
+    margin-bottom: 48px;
+    animation: fadeUp 0.5s 0.1s ease both;
+  }
+
+  /* CHANGELOG ENTRIES */
+  .changelog { position: relative; }
+
+  .changelog::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 8px;
+    bottom: 0;
+    width: 1px;
+    background: var(--border2);
+  }
+
+  .entry {
+    display: flex;
+    gap: 28px;
+    padding-left: 28px;
+    margin-bottom: 48px;
+    position: relative;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .entry:nth-child(1) { animation-delay: 0.1s; }
+  .entry:nth-child(2) { animation-delay: 0.15s; }
+  .entry:nth-child(3) { animation-delay: 0.2s; }
+  .entry:nth-child(4) { animation-delay: 0.25s; }
+
+  .entry-dot {
+    position: absolute;
+    left: -5px;
+    top: 10px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid var(--bg);
+    flex-shrink: 0;
+  }
+
+  .entry-meta {
+    width: 120px;
+    flex-shrink: 0;
+    padding-top: 6px;
+  }
+
+  .entry-version {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .entry-date {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text3);
+  }
+
+  .entry-body {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    transition: border-color 0.2s;
+  }
+
+  .entry-body:hover { border-color: var(--border2); }
+
+  .entry-title {
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+
+  .entry-summary {
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+
+  .entry-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+
+  .tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 20px;
+    letter-spacing: 0.05em;
+  }
+
+  .tag-feature  { background: var(--accent-glow); color: var(--accent2); border: 1px solid #6c63ff25; }
+  .tag-fix      { background: var(--green-dim); color: var(--green); border: 1px solid #00e5a025; }
+  .tag-breaking { background: var(--red-dim); color: var(--red); border: 1px solid #ff4d6a25; }
+  .tag-perf     { background: var(--yellow-dim); color: var(--yellow); border: 1px solid #f5c54225; }
+  .tag-security { background: #38b2f415; color: var(--blue); border: 1px solid #38b2f425; }
+
+  .entry-changes {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .entry-changes li {
+    font-size: 12px;
+    color: var(--text2);
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    line-height: 1.5;
+  }
+
+  .change-bullet {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .bullet-feat { background: var(--accent-glow); color: var(--accent2); }
+  .bullet-fix  { background: var(--green-dim); color: var(--green); }
+  .bullet-brk  { background: var(--red-dim); color: var(--red); }
+  .bullet-perf { background: var(--yellow-dim); color: var(--yellow); }
+
+  code {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent2);
+    background: var(--accent-glow);
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="logo-mark" href="/">
+    <div class="logo-icon"></div>
+    <span class="logo-text">STAARK<span>.</span></span>
+  </a>
+  <div class="nav-right">
+    <a class="nav-link active" href="/changelog">Changelog</a>
+    <a class="nav-link" href="/sdks">SDKs</a>
+    <a class="nav-link" href="/status">Status</a>
+    <a class="nav-cta" href="/v1/get-key">Get API Key →</a>
+  </div>
+</nav>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-sticky">
+      <div class="sidebar-title">Jump to</div>
+      <a class="sidebar-link active" href="#v142">v1.4.2</a>
+      <a class="sidebar-link" href="#v141">v1.4.1</a>
+      <a class="sidebar-link" href="#v140">v1.4.0</a>
+      <a class="sidebar-link" href="#v130">v1.3.0</a>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <main>
+    <div class="page-eyebrow">Release Notes</div>
+    <h1>Changelog</h1>
+    <p class="page-desc">All notable changes to the Staark API are documented here. We follow semantic versioning.</p>
+
+    <div class="changelog">
+
+      <!-- v1.4.2 -->
+      <div class="entry" id="v142">
+        <div class="entry-dot" style="background:var(--green)"></div>
+        <div class="entry-meta">
+          <div class="entry-version" style="color:var(--green)">v1.4.2</div>
+          <div class="entry-date">Mar 04, 2026</div>
+        </div>
+        <div class="entry-body">
+          <div class="entry-title">Webhook improvements & bug fixes</div>
+          <div class="entry-summary">Minor release with expanded webhook event coverage and stability fixes across the tasks endpoint.</div>
+          <div class="entry-tags">
+            <span class="tag tag-feature">Feature</span>
+            <span class="tag tag-fix">Fix</span>
+          </div>
+          <ul class="entry-changes">
+            <li><span class="change-bullet bullet-feat">feat</span> Added <code>task.deleted</code> webhook event</li>
+            <li><span class="change-bullet bullet-feat">feat</span> Webhook payloads now include <code>actor_id</code> field</li>
+            <li><span class="change-bullet bullet-fix">fix</span> Fixed pagination on <code>GET /tasks</code> returning duplicate items</li>
+            <li><span class="change-bullet bullet-fix">fix</span> <code>due_date</code> now correctly accepts ISO 8601 format</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- v1.4.1 -->
+      <div class="entry" id="v141">
+        <div class="entry-dot" style="background:var(--yellow)"></div>
+        <div class="entry-meta">
+          <div class="entry-version" style="color:var(--yellow)">v1.4.1</div>
+          <div class="entry-date">Feb 18, 2026</div>
+        </div>
+        <div class="entry-body">
+          <div class="entry-title">Performance & security patch</div>
+          <div class="entry-summary">Response times on large project queries improved by ~40%. Rate limiting headers are now included in all responses.</div>
+          <div class="entry-tags">
+            <span class="tag tag-perf">Performance</span>
+            <span class="tag tag-security">Security</span>
+          </div>
+          <ul class="entry-changes">
+            <li><span class="change-bullet bullet-perf">perf</span> Optimized <code>GET /projects</code> query — up to 40% faster</li>
+            <li><span class="change-bullet bullet-feat">feat</span> Added <code>X-RateLimit-Remaining</code> and <code>X-RateLimit-Reset</code> headers</li>
+            <li><span class="change-bullet bullet-fix">fix</span> API keys are now compared using constant-time comparison</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- v1.4.0 -->
+      <div class="entry" id="v140">
+        <div class="entry-dot" style="background:var(--accent2)"></div>
+        <div class="entry-meta">
+          <div class="entry-version" style="color:var(--accent2)">v1.4.0</div>
+          <div class="entry-date">Jan 30, 2026</div>
+        </div>
+        <div class="entry-body">
+          <div class="entry-title">Webhooks — General Availability</div>
+          <div class="entry-summary">Webhooks are now out of beta and available on all plans. Pro plan gets higher delivery guarantees and retry logic.</div>
+          <div class="entry-tags">
+            <span class="tag tag-feature">Feature</span>
+          </div>
+          <ul class="entry-changes">
+            <li><span class="change-bullet bullet-feat">feat</span> <code>POST /webhooks</code> — register endpoint for real-time events</li>
+            <li><span class="change-bullet bullet-feat">feat</span> HMAC-SHA256 signature verification via <code>X-Staark-Signature</code></li>
+            <li><span class="change-bullet bullet-feat">feat</span> Automatic retry with exponential backoff (Pro only)</li>
+            <li><span class="change-bullet bullet-feat">feat</span> Supported events: <code>task.created</code>, <code>task.updated</code>, <code>project.archived</code>, <code>member.invited</code></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- v1.3.0 -->
+      <div class="entry" id="v130">
+        <div class="entry-dot" style="background:var(--red)"></div>
+        <div class="entry-meta">
+          <div class="entry-version" style="color:var(--red)">v1.3.0</div>
+          <div class="entry-date">Dec 12, 2025</div>
+        </div>
+        <div class="entry-body">
+          <div class="entry-title">Breaking: pagination & auth changes</div>
+          <div class="entry-summary">Standardized pagination across all list endpoints. Authentication now requires Bearer prefix — plain token no longer accepted.</div>
+          <div class="entry-tags">
+            <span class="tag tag-breaking">Breaking</span>
+            <span class="tag tag-feature">Feature</span>
+          </div>
+          <ul class="entry-changes">
+            <li><span class="change-bullet bullet-brk">break</span> Auth header must now use <code>Bearer</code> prefix explicitly</li>
+            <li><span class="change-bullet bullet-brk">break</span> Pagination response shape changed — <code>total</code> moved inside <code>meta</code> object</li>
+            <li><span class="change-bullet bullet-feat">feat</span> Added <code>cursor</code>-based pagination on <code>GET /tasks</code></li>
+            <li><span class="change-bullet bullet-fix">fix</span> Removed deprecated <code>/v0</code> endpoints</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+</body>
+</html>

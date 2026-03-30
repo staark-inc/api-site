@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Staark API — System Status</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --bg2: #0f0f18;
+    --surface: #161625;
+    --border: #ffffff0d;
+    --border2: #ffffff18;
+    --accent: #6c63ff;
+    --accent2: #8b85ff;
+    --accent-glow: #6c63ff40;
+    --green: #00e5a0;
+    --green-dim: #00e5a015;
+    --red: #ff4d6a;
+    --red-dim: #ff4d6a15;
+    --yellow: #f5c542;
+    --yellow-dim: #f5c54215;
+    --text: #e8e8f0;
+    --text2: #9090b0;
+    --text3: #5a5a7a;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Syne', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100vh; }
+
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 48px;
+    background: #0a0a0fcc; backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo-mark { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .logo-icon {
+    width: 30px; height: 30px; background: var(--accent);
+    border-radius: 7px; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 16px var(--accent-glow);
+  }
+  .logo-icon::before {
+    content: ''; width: 11px; height: 11px;
+    border: 2px solid #fff; border-radius: 3px; transform: rotate(15deg);
+  }
+  .logo-text { font-size: 17px; font-weight: 800; letter-spacing: 0.08em; color: var(--text); }
+  .logo-text span { color: var(--accent2); }
+
+  .nav-right { display: flex; align-items: center; gap: 8px; }
+  .nav-link { font-size: 13px; font-weight: 600; color: var(--text2); text-decoration: none; padding: 6px 14px; border-radius: 6px; transition: all 0.15s; }
+  .nav-link:hover { color: var(--text); background: var(--border); }
+  .nav-link.active { color: var(--accent2); }
+  .nav-cta { font-size: 13px; font-weight: 700; color: #fff; background: var(--accent); text-decoration: none; padding: 7px 16px; border-radius: 7px; box-shadow: 0 0 16px var(--accent-glow); margin-left: 4px; transition: all 0.15s; }
+  .nav-cta:hover { background: var(--accent2); }
+
+  .layout { max-width: 860px; margin: 0 auto; padding: 64px 48px; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes pulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.35; transform:scale(0.8); } }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .page-eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: 0.2em; color: var(--accent2); text-transform: uppercase; margin-bottom: 12px; animation: fadeUp 0.5s ease both; }
+  h1 { font-size: 42px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 12px; background: linear-gradient(135deg,#fff 0%,#9090c0 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: fadeUp 0.5s 0.05s ease both; }
+  .page-desc { font-size: 15px; color: var(--text2); line-height: 1.6; margin-bottom: 40px; animation: fadeUp 0.5s 0.1s ease both; display: flex; align-items: center; gap: 10px; }
+
+  .refresh-btn { font-family: var(--mono); font-size: 10px; color: var(--text3); background: none; border: 1px solid var(--border2); padding: 4px 10px; border-radius: 5px; cursor: pointer; transition: all 0.15s; }
+  .refresh-btn:hover { color: var(--text); border-color: var(--accent); }
+  .refresh-btn.spinning .icon { display: inline-block; animation: spin 0.7s linear infinite; }
+
+  /* LOADING */
+  .loading-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 0; gap: 16px; }
+  .spinner { width: 32px; height: 32px; border: 2px solid var(--border2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+  .loading-text { font-family: var(--mono); font-size: 12px; color: var(--text3); }
+
+  /* ERROR */
+  .error-state { display: none; align-items: center; gap: 14px; background: var(--red-dim); border: 1px solid #ff4d6a25; border-radius: 10px; padding: 14px 18px; margin-bottom: 24px; }
+  .error-text { font-size: 13px; color: var(--text2); line-height: 1.5; }
+  .error-text strong { color: var(--red); }
+
+  /* BANNER */
+  .status-banner { display: flex; align-items: center; gap: 16px; border-radius: 14px; padding: 20px 24px; margin-bottom: 40px; border: 1px solid; animation: fadeUp 0.5s 0.12s ease both; }
+  .banner-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+  .banner-text { flex: 1; }
+  .banner-title { font-size: 16px; font-weight: 700; margin-bottom: 2px; }
+  .banner-sub { font-size: 12px; color: var(--text2); }
+  .banner-time { font-family: var(--mono); font-size: 11px; color: var(--text3); }
+  .banner-ok   { background: var(--green-dim); border-color: #00e5a025; }
+  .banner-deg  { background: var(--yellow-dim); border-color: #f5c54225; }
+  .banner-down { background: var(--red-dim); border-color: #ff4d6a25; }
+
+  /* SECTION LABEL */
+  .section-label { font-family: var(--mono); font-size: 9px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text3); margin-bottom: 12px; }
+
+  /* SERVICES */
+  .services { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; margin-bottom: 40px; animation: fadeUp 0.5s 0.15s ease both; }
+  .services-header { display: flex; align-items: center; gap: 16px; padding: 10px 24px; border-bottom: 1px solid var(--border); background: var(--bg2); }
+  .services-header span { font-family: var(--mono); font-size: 9px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text3); }
+
+  .service-row { display: flex; align-items: center; gap: 16px; padding: 16px 24px; border-bottom: 1px solid var(--border); transition: background 0.15s; }
+  .service-row:last-child { border-bottom: none; }
+  .service-row:hover { background: var(--border); }
+
+  .service-name { font-size: 14px; font-weight: 600; color: var(--text); flex: 1; }
+  .service-path { font-family: var(--mono); font-size: 11px; color: var(--text3); font-weight: 400; margin-left: 8px; }
+  .service-latency { font-family: var(--mono); font-size: 11px; color: var(--text3); width: 70px; text-align: right; }
+  .service-uptime  { font-family: var(--mono); font-size: 11px; color: var(--text2); width: 60px; text-align: right; }
+
+  .status-pill { display: flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 20px; letter-spacing: 0.05em; width: 120px; justify-content: center; }
+  .pill-dot { width: 6px; height: 6px; border-radius: 50%; }
+  .status-ok   { background: var(--green-dim); color: var(--green); border: 1px solid #00e5a025; }
+  .status-deg  { background: var(--yellow-dim); color: var(--yellow); border: 1px solid #f5c54225; }
+  .status-down { background: var(--red-dim); color: var(--red); border: 1px solid #ff4d6a25; }
+
+  /* UPTIME BARS */
+  .uptime-section { margin-bottom: 40px; animation: fadeUp 0.5s 0.2s ease both; }
+  .uptime-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px 24px; margin-bottom: 12px; }
+  .uptime-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .uptime-name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .uptime-pct  { font-family: var(--mono); font-size: 12px; font-weight: 700; }
+  .uptime-bar  { display: flex; gap: 2px; height: 28px; align-items: flex-end; }
+  .bar-day { flex: 1; border-radius: 3px; cursor: pointer; transition: opacity 0.15s; }
+  .bar-day:hover { opacity: 0.6; }
+  .uptime-labels { display: flex; justify-content: space-between; margin-top: 6px; }
+  .uptime-label  { font-family: var(--mono); font-size: 9px; color: var(--text3); }
+
+  /* INCIDENTS */
+  .incidents { animation: fadeUp 0.5s 0.25s ease both; }
+  .no-incidents { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 32px; text-align: center; }
+  .no-inc-icon  { font-size: 28px; margin-bottom: 12px; }
+  .no-inc-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+  .no-inc-sub   { font-size: 13px; color: var(--text3); }
+
+  /* ENDPOINTS */
+  .endpoints-section { margin-bottom: 40px; animation: fadeUp 0.5s 0.3s ease both; }
+  .endpoint-group { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; margin-bottom: 12px; }
+  .endpoint-group-header { display: flex; align-items: center; gap: 10px; padding: 10px 24px; border-bottom: 1px solid var(--border); background: var(--bg2); }
+  .endpoint-group-name { font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text2); }
+  .endpoint-group-path { font-family: var(--mono); font-size: 10px; color: var(--text3); margin-left: auto; }
+  .endpoint-row { display: flex; align-items: center; gap: 14px; padding: 11px 24px; border-bottom: 1px solid var(--border); }
+  .endpoint-row:last-child { border-bottom: none; }
+  .method { font-family: var(--mono); font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 5px; letter-spacing: 0.04em; width: 54px; text-align: center; flex-shrink: 0; }
+  .method-get    { background: #00e5a015; color: var(--green); border: 1px solid #00e5a025; }
+  .method-post   { background: #6c63ff15; color: var(--accent2); border: 1px solid #6c63ff25; }
+  .method-put    { background: #f5c54215; color: var(--yellow); border: 1px solid #f5c54225; }
+  .method-delete { background: #ff4d6a15; color: var(--red); border: 1px solid #ff4d6a25; }
+  .endpoint-path { font-family: var(--mono); font-size: 12px; color: var(--text); flex: 1; }
+  .endpoint-path span { color: var(--text3); }
+  .endpoint-desc { font-size: 12px; color: var(--text3); text-align: right; flex-shrink: 0; width: 200px; }
+  .badge-new { font-family: var(--mono); font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; background: #00e5a018; color: var(--green); border: 1px solid #00e5a030; padding: 2px 6px; border-radius: 4px; flex-shrink: 0; }
+  .badge-auth { font-family: var(--mono); font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; background: #6c63ff10; color: var(--accent2); border: 1px solid #6c63ff20; padding: 2px 6px; border-radius: 4px; flex-shrink: 0; }
+
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="logo-mark" href="/">
+    <div class="logo-icon"></div>
+    <span class="logo-text">STAARK<span>.</span></span>
+  </a>
+  <div class="nav-right">
+    <a class="nav-link" href="/changelog">Changelog</a>
+    <a class="nav-link" href="/sdks">SDKs</a>
+    <a class="nav-link active" href="/status">Status</a>
+    <a class="nav-cta" href="/v1/get-key">Get API Key →</a>
+  </div>
+</nav>
+
+<div class="layout">
+
+  <div class="page-eyebrow">System Status</div>
+  <h1>All Systems</h1>
+  <p class="page-desc">
+    Live status from <code style="font-family:var(--mono);font-size:12px;color:var(--accent2)">/v1/status</code>. Auto-refreshes every 60s.
+    <button class="refresh-btn" id="refresh-btn" onclick="fetchStatus()">
+      <span class="icon">↻</span> Refresh
+    </button>
+  </p>
+
+  <div class="error-state" id="error-state">
+    <span style="font-size:18px">⚠</span>
+    <div class="error-text"><strong>Could not reach status endpoint.</strong> Retrying in 60 seconds.</div>
+  </div>
+
+  <div class="loading-state" id="loading-state">
+    <div class="spinner"></div>
+    <div class="loading-text">Fetching live status...</div>
+  </div>
+
+  <div id="content" style="display:none">
+
+    <div class="status-banner" id="status-banner">
+      <div class="banner-dot" id="banner-dot"></div>
+      <div class="banner-text">
+        <div class="banner-title" id="banner-title"></div>
+        <div class="banner-sub"   id="banner-sub"></div>
+      </div>
+      <div class="banner-time" id="banner-time"></div>
+    </div>
+
+    <div class="section-label">Core Services</div>
+    <div class="services">
+      <div class="services-header">
+        <span style="flex:1">Service</span>
+        <span style="width:70px;text-align:right">Latency</span>
+        <span style="width:60px;text-align:right">Uptime</span>
+        <span style="width:120px;text-align:center">Status</span>
+      </div>
+      <div id="services-list"></div>
+    </div>
+
+    <div class="uptime-section">
+      <div class="section-label">Uptime (90-day view)</div>
+      <div id="uptime-bars"></div>
+    </div>
+
+    <div class="incidents">
+      <div class="section-label">Active Incidents</div>
+      <div id="incidents-block"></div>
+    </div>
+
+  </div>
+</div>
+
+<div class="layout" style="padding-top:0">
+  <div class="endpoints-section">
+    <div class="section-label">API Endpoints</div>
+
+    <!-- Auth -->
+    <div class="endpoint-group">
+      <div class="endpoint-group-header">
+        <span class="endpoint-group-name">Authentication</span>
+        <span class="endpoint-group-path">/v1/auth</span>
+      </div>
+      <div class="endpoint-row">
+        <span class="method method-post">POST</span>
+        <span class="endpoint-path">/v1/auth/register</span>
+        <span class="endpoint-desc">Create account</span>
+      </div>
+      <div class="endpoint-row">
+        <span class="method method-post">POST</span>
+        <span class="endpoint-path">/v1/auth/login</span>
+        <span class="endpoint-desc">Login → access + refresh tokens</span>
+      </div>
+      <div class="endpoint-row">
+        <span class="method method-post">POST</span>
+        <span class="endpoint-path">/v1/auth/logout</span>
+        <span class="badge-auth">bearer</span>
+        <span class="endpoint-desc">Revoke refresh token</span>
+      </div>
+      <div class="endpoint-row">
+        <span class="method method-post">POST</span>
+        <span class="endpoint-path">/v1/auth/refresh</span>
+        <span class="badge-auth">bearer</span>
+        <span class="endpoint-desc">Rotate tokens</span>
+      </div>
+      <div class="endpoint-row">
+        <span class="method method-post">POST</span>
+        <span class="endpoint-path">/v1/auth/verify-email</span>
+        <span class="endpoint-desc">Verify email address</span>
+      </div>
+      <div class="endpoint-row">
+        <span class="method method-post">POST</span>
+        <span class="endpoint-path">/v1/auth/forgot-password</span>
+        <span class="endpoint-desc">Request password reset</span>
+      </div>
+      <div class="endpoint-row">
+        <span class="method method-post">POST</span>
+        <span class="endpoint-path">/v1/auth/reset-password</span>
+        <span class="endpoint-desc">Set new password</span>
+      </div>
+    </div>
+
+    <!-- API Keys -->
+    <div class="endpoint-group">
+      <div class="endpoint-group-header">
+        <span class="endpoint-group-name">API Keys</span>
+        <span class="endpoint-group-path">/v1/keys</span>
+      </div>
+      <div class="endpoint-row">
+        <span class="method method-post">POST</span>
+        <span class="endpoint-path">/v1/keys</span>
+        <span class="endpoint-desc">Generate new key</span>
+      </div>
+      <div class="endpoint-row">
+        <span class="method method-get">GET</span>
+        <span class="endpoint-path">/v1/keys/<span>:user_id</span></span>
+        <span class="endpoint-desc">List keys for user</span>
+      </div>
+      <div class="endpoint-row">
+        <span class="method method-delete">DEL</span>
+        <span class="endpoint-path">/v1/keys/<span>:id</span></span>
+        <span class="endpoint-desc">Revoke key</span>
+      </div>
+    </div>
+
+    <!-- Projects -->
+    <div class="endpoint-group">
+      <div class="endpoint-group-header">
+        <span class="endpoint-group-name">Projects</span>
+        <span class="endpoint-group-path">/v1/projects — requires API key</span>
+      </div>
+      <div class="endpoint-row">
+        <span class="method method-get">GET</span>
+        <span class="endpoint-path">/v1/projects</span>
+        <span class="endpoint-desc">List projects</span>
+      </div>
+      <div class="endpoint-row">
+        <span class="method method-post">POST</span>
+        <span class="endpoint-path">/v1/projects</span>
+        <span class="endpoint-desc">Create project</span>
+      </div>
+      <div class="endpoint-row">
+        <span class="method method-get">GET</span>
+        <span class="endpoint-path">/v1/projects/<span>:id</span></span>
+        <span class="endpoint-desc">Get project</span>
+      </div>
+      <div class="endpoint-row">
+        <span class="method method-put">PUT</span>
+        <span class="endpoint-path">/v1/projects/<span>:id</span></span>
+        <span class="endpoint-desc">Update project</span>
+      </div>
+      <div class="endpoint-row">
+        <span class="method method-delete">DEL</span>
+        <span class="endpoint-path">/v1/projects/<span>:id</span></span>
+        <span class="endpoint-desc">Delete project</span>
+      </div>
+      <div class="endpoint-row">
+        <span class="method method-get">GET</span>
+        <span class="endpoint-path">/v1/projects/<span>:id</span>/tasks</span>
+        <span class="endpoint-desc">List tasks in project</span>
+      </div>
+      <div class="endpoint-row">
+        <span class="method method-post">POST</span>
+        <span class="endpoint-path">/v1/projects/<span>:id</span>/tasks</span>
+        <span class="endpoint-desc">Create task in project</span>
+      </div>
+    </div>
+
+    <!-- Tasks -->
+    <div class="endpoint-group">
+      <div class="endpoint-group-header">
+        <span class="endpoint-group-name">Tasks</span>
+        <span class="endpoint-group-path">/v1/tasks — requires API key</span>
+      </div>
+      <div class="endpoint-row">
+        <span class="method method-get">GET</span>
+        <span class="endpoint-path">/v1/tasks/<span>:id</span></span>
+        <span class="endpoint-desc">Get task</span>
+      </div>
+      <div class="endpoint-row">
+        <span class="method method-put">PUT</span>
+        <span class="endpoint-path">/v1/tasks/<span>:id</span></span>
+        <span class="endpoint-desc">Update task</span>
+      </div>
+      <div class="endpoint-row">
+        <span class="method method-delete">DEL</span>
+        <span class="endpoint-path">/v1/tasks/<span>:id</span></span>
+        <span class="endpoint-desc">Delete task</span>
+      </div>
+    </div>
+
+    <!-- SSH Connections — NEW -->
+    <div class="endpoint-group">
+      <div class="endpoint-group-header">
+        <span class="endpoint-group-name">SSH Connections</span>
+        <span style="margin-left:10px" class="badge-new">new</span>
+        <span class="endpoint-group-path">/v1/ssh/connections — requires API key</span>
+      </div>
+      <div class="endpoint-row">
+        <span class="method method-get">GET</span>
+        <span class="endpoint-path">/v1/ssh/connections</span>
+        <span class="badge-new">new</span>
+        <span class="endpoint-desc">List saved connections</span>
+      </div>
+      <div class="endpoint-row">
+        <span class="method method-put">PUT</span>
+        <span class="endpoint-path">/v1/ssh/connections/<span>:id</span></span>
+        <span class="badge-new">new</span>
+        <span class="endpoint-desc">Create or update connection</span>
+      </div>
+      <div class="endpoint-row">
+        <span class="method method-delete">DEL</span>
+        <span class="endpoint-path">/v1/ssh/connections/<span>:id</span></span>
+        <span class="badge-new">new</span>
+        <span class="endpoint-desc">Delete connection</span>
+      </div>
+      <div class="endpoint-row">
+        <span class="method method-post">POST</span>
+        <span class="endpoint-path">/v1/ssh/connections/sync</span>
+        <span class="badge-new">new</span>
+        <span class="endpoint-desc">Bulk sync — push all connections</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const STATUS_API = '/v1/status';
+  const HISTORY_API = '/v1/status/history?days=90';
+
+  function statusClass(s) {
+    if (!s || s === 'Down') return 'down';
+    if (s === 'Degraded') return 'deg';
+    return 'ok';
+  }
+
+  function statusColor(cls) {
+    return cls === 'down' ? 'var(--red)' : cls === 'deg' ? 'var(--yellow)' : 'var(--green)';
+  }
+
+  function fmtTime(iso) {
+    const d = new Date(iso);
+    return 'Updated ' + d.toLocaleTimeString('en-GB', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    });
+  }
+
+  function fmtLatency(ms) {
+    return (ms === 0 || ms == null) ? '—' : ms + ' ms';
+  }
+
+  function fmtUptime(pct) {
+    if (pct == null) return '—';
+    return Number(pct).toFixed(Number(pct) % 1 === 0 ? 0 : 2) + '%';
+  }
+
+  function renderBanner(services, generatedAt) {
+    const down = services.filter(s => statusClass(s.status) === 'down').length;
+    const deg = services.filter(s => statusClass(s.status) === 'deg').length;
+
+    const banner = document.getElementById('status-banner');
+    const dot = document.getElementById('banner-dot');
+    const title = document.getElementById('banner-title');
+    const sub = document.getElementById('banner-sub');
+
+    dot.style.animation = 'pulse 2s infinite';
+
+    if (down > 0) {
+      banner.className = 'status-banner banner-down';
+      dot.style.background = 'var(--red)';
+      title.style.color = 'var(--red)';
+      title.textContent = `${down} service${down > 1 ? 's' : ''} down`;
+      sub.textContent = 'Some services are currently unavailable.';
+    } else if (deg > 0) {
+      banner.className = 'status-banner banner-deg';
+      dot.style.background = 'var(--yellow)';
+      title.style.color = 'var(--yellow)';
+      title.textContent = 'Partial degradation detected';
+      sub.textContent = 'Some services are slower than expected.';
+    } else {
+      banner.className = 'status-banner banner-ok';
+      dot.style.background = 'var(--green)';
+      title.style.color = 'var(--green)';
+      title.textContent = 'All systems operational';
+      sub.textContent = 'No active incidents detected.';
+    }
+
+    document.getElementById('banner-time').textContent = fmtTime(generatedAt);
+  }
+
+  function renderServices(services) {
+    document.getElementById('services-list').innerHTML = services.map(s => {
+      const cls = statusClass(s.status);
+      const color = statusColor(cls);
+      const anim = cls !== 'ok' ? 'animation:pulse 1.8s infinite' : '';
+
+      return `
+        <div class="service-row">
+          <div class="service-name">
+            ${s.name}
+            <span class="service-path">${s.target}</span>
+          </div>
+          <div class="service-latency">${fmtLatency(s.latencyMs)}</div>
+          <div class="service-uptime">${fmtUptime(s.uptimePercent)}</div>
+          <div class="status-pill status-${cls}">
+            <div class="pill-dot" style="background:${color};${anim}"></div>
+            ${s.status || 'Unknown'}
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function buildHistoryMap(historyRows) {
+    const map = {};
+
+    for (const row of historyRows) {
+      if (!map[row.service_name]) {
+        map[row.service_name] = [];
+      }
+      map[row.service_name].push(row);
+    }
+
+    return map;
+  }
+
+  function renderUptimeBars(services, historyRows) {
+    const container = document.getElementById('uptime-bars');
+    container.innerHTML = '';
+
+    // grupăm istoricul pe servicii
+    const historyMap = {};
+    historyRows.forEach(row => {
+      if (!historyMap[row.service_name]) {
+        historyMap[row.service_name] = [];
+      }
+      historyMap[row.service_name].push(row);
+    });
+
+    services.forEach(service => {
+
+      const rows = historyMap[service.name] || [];
+
+      const uptimeAvg = rows.length
+        ? rows.reduce((a, r) => a + Number(r.uptime_percent || 0), 0) / rows.length
+        : service.uptimePercent || 0;
+
+      const pctColor =
+        uptimeAvg >= 99   ? 'var(--green)'  :
+        uptimeAvg >= 80   ? 'var(--yellow)' :  // era 95
+        'var(--red)';
+
+      const card = document.createElement('div');
+      card.className = 'uptime-card';
+
+      card.innerHTML = `
+        <div class="uptime-header">
+          <div class="uptime-name">${service.name}</div>
+          <div class="uptime-pct" style="color:${pctColor}">
+            ${uptimeAvg.toFixed(2)}%
+          </div>
+        </div>
+        <div class="uptime-bar"></div>
+        <div class="uptime-labels">
+          <span class="uptime-label">90 days ago</span>
+          <span class="uptime-label">Today</span>
+        </div>
+      `;
+
+      const bar = card.querySelector('.uptime-bar');
+
+      if (rows.length === 0) {
+        for (let i = 0; i < 90; i++) {
+          const d = document.createElement('div');
+          d.className = 'bar-day';
+          d.style.height = (12 + Math.random() * 16) + 'px';
+          d.style.background = 'var(--border2)';
+          d.title = 'No data';
+          bar.appendChild(d);
+        }
+      } else {
+        rows.forEach(row => {
+          const pct = Number(row.uptime_percent || 0);
+
+          const d = document.createElement('div');
+          d.className = 'bar-day';
+          d.style.height = (12 + Math.random() * 16) + 'px';
+
+          if (pct === 100) {
+            d.style.background = 'var(--green)';
+            d.style.opacity = 0.6 + Math.random() * 0.3;
+          } else if (pct >= 80) {
+            d.style.background = 'var(--yellow)';
+          } else {
+            d.style.background = 'var(--red)';
+          }
+
+          d.title = `${row.day} · ${pct}%`;
+          bar.appendChild(d);
+        });
+      }
+
+      container.appendChild(card);
+    });
+  }
+
+  function renderIncidents(services, generatedAt) {
+    const down = services.filter(s => statusClass(s.status) === 'down');
+    const block = document.getElementById('incidents-block');
+
+    if (down.length === 0) {
+      block.innerHTML = `
+        <div class="no-incidents">
+          <div class="no-inc-icon">✓</div>
+          <div class="no-inc-title">No active incidents</div>
+          <div class="no-inc-sub">All services healthy as of ${fmtTime(generatedAt)}.</div>
+        </div>
+      `;
+      return;
+    }
+
+    block.innerHTML = `
+      <div class="no-incidents" style="text-align:left;padding:0;overflow:hidden">
+        ${down.map(s => `
+          <div style="display:flex;gap:14px;padding:20px 24px;border-bottom:1px solid var(--border)">
+            <div style="flex-shrink:0;width:8px;height:8px;border-radius:50%;background:var(--red);margin-top:5px;animation:pulse 1.5s infinite"></div>
+            <div>
+              <div style="font-size:14px;font-weight:700;color:var(--red);margin-bottom:4px">${s.name} — ${s.status}</div>
+              <div style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:6px">${s.error || 'Service is currently unreachable.'}</div>
+              <div style="font-family:var(--mono);font-size:10px;color:var(--text3)">Detected · ${fmtTime(generatedAt)}</div>
+            </div>
+          </div>
+        `).join('')}
+        <div style="padding:16px 24px;font-size:12px;color:var(--text3)">
+          Monitoring is active and the issue is being tracked.
+        </div>
+      </div>
+    `;
+  }
+
+  async function fetchStatus() {
+    const loading = document.getElementById('loading-state');
+    const content = document.getElementById('content');
+    const errEl = document.getElementById('error-state');
+    const btn = document.getElementById('refresh-btn');
+
+    btn.classList.add('spinning');
+
+    try {
+      const [statusRes, historyRes] = await Promise.all([
+        fetch('/v1/status', { cache: 'no-store' }),
+        fetch('/v1/status/history?days=90', { cache: 'no-store' })
+      ]);
+
+      if (!statusRes.ok) throw new Error('Status HTTP ' + statusRes.status);
+      if (!historyRes.ok) throw new Error('History HTTP ' + historyRes.status);
+
+      const statusData = await statusRes.json();
+      const historyData = await historyRes.json();
+
+      renderBanner(statusData.services, statusData.generatedAt);
+      renderServices(statusData.services);
+      renderUptimeBars(statusData.services, historyData.history || []);
+      renderIncidents(statusData.services, statusData.generatedAt);
+
+      loading.style.display = 'none';
+      errEl.style.display = 'none';
+      content.style.display = 'block';
+    } catch (e) {
+      console.error('Status fetch error:', e);
+      loading.style.display = 'none';
+      errEl.style.display = 'flex';
+    } finally {
+      btn.classList.remove('spinning');
+    }
+  }
+  fetchStatus();
+  setInterval(fetchStatus, 60000);
+</script>
+</body>
+</html>

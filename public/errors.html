@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Staark API — Errors</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0a0a0f;--bg2:#0f0f18;--surface:#161625;--border:#ffffff0d;--border2:#ffffff18;
+    --accent:#6c63ff;--accent2:#8b85ff;--accent-glow:#6c63ff40;
+    --green:#00e5a0;--green-dim:#00e5a015;--red:#ff4d6a;--red-dim:#ff4d6a15;
+    --yellow:#f5c542;--yellow-dim:#f5c54215;--blue:#38b2f4;--blue-dim:#38b2f415;
+    --text:#e8e8f0;--text2:#9090b0;--text3:#5a5a7a;
+    --mono:'JetBrains Mono',monospace;--sans:'Syne',sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);display:flex;min-height:100vh;}
+
+  aside{width:260px;min-width:260px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;}
+  .logo{padding:28px 24px 20px;border-bottom:1px solid var(--border);}
+  .logo-mark{display:flex;align-items:center;gap:10px;text-decoration:none;}
+  .logo-icon{width:32px;height:32px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 20px var(--accent-glow);}
+  .logo-icon::before{content:'';width:12px;height:12px;border:2.5px solid #fff;border-radius:3px;transform:rotate(15deg);}
+  .logo-text{font-size:18px;font-weight:800;letter-spacing:0.08em;color:var(--text);}
+  .logo-text span{color:var(--accent2);}
+  .version-badge{margin-top:10px;display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;color:var(--green);background:var(--green-dim);border:1px solid #00e5a030;padding:3px 8px;border-radius:20px;}
+  .version-badge::before{content:'';width:5px;height:5px;background:var(--green);border-radius:50%;animation:pulse 2s infinite;}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+  nav{padding:16px 0;flex:1;}
+  .nav-label{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--text3);padding:12px 24px 6px;}
+  .nav-link{display:flex;align-items:center;gap:10px;padding:8px 24px;font-size:13px;font-weight:500;color:var(--text2);text-decoration:none;transition:all 0.15s;border-left:2px solid transparent;margin:0 0 1px;}
+  .nav-link:hover{color:var(--text);background:var(--border);}
+  .nav-link.active{color:var(--accent2);background:var(--accent-glow);border-left-color:var(--accent);}
+  .nav-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+  .method-tag{font-family:var(--mono);font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;letter-spacing:0.05em;margin-left:auto;}
+  .tag-get{background:var(--green-dim);color:var(--green);}
+  .tag-post{background:var(--blue-dim);color:var(--blue);}
+  .tag-put{background:var(--yellow-dim);color:var(--yellow);}
+
+  .topbar{position:fixed;top:0;left:260px;right:0;height:52px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 48px;z-index:100;gap:16px;}
+  .search-bar{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:6px 14px;width:280px;}
+  .search-bar input{background:none;border:none;outline:none;font-family:var(--mono);font-size:12px;color:var(--text);width:100%;}
+  .search-bar input::placeholder{color:var(--text3);}
+  .topbar-links{display:flex;gap:4px;margin-left:auto;}
+  .topbar-link{font-size:12px;color:var(--text2);padding:5px 12px;border-radius:6px;transition:all 0.15s;font-weight:500;text-decoration:none;}
+  .topbar-link:hover{color:var(--text);background:var(--border);}
+  .topbar-cta{font-size:12px;color:#fff;background:var(--accent);padding:6px 14px;border-radius:6px;font-weight:600;text-decoration:none;box-shadow:0 0 16px var(--accent-glow);}
+
+  main{flex:1;overflow-y:auto;max-width:860px;padding:80px 56px 80px;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+  .page-eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--accent2);text-transform:uppercase;margin-bottom:12px;animation:fadeUp 0.5s ease both;}
+  h1{font-size:42px;font-weight:800;letter-spacing:-0.02em;margin-bottom:14px;background:linear-gradient(135deg,#fff 0%,#9090c0 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:fadeUp 0.5s 0.05s ease both;}
+  .page-desc{font-size:15px;color:var(--text2);line-height:1.7;margin-bottom:48px;animation:fadeUp 0.5s 0.1s ease both;}
+  .section{margin-bottom:56px;animation:fadeUp 0.5s ease both;}
+  h2{font-size:22px;font-weight:700;letter-spacing:-0.01em;margin-bottom:20px;color:var(--text);display:flex;align-items:center;gap:12px;}
+  h2::before{content:'';display:block;width:3px;height:22px;background:var(--accent);border-radius:2px;}
+
+  /* HTTP STATUS CARDS */
+  .status-grid{display:flex;flex-direction:column;gap:12px;margin-bottom:24px;}
+  .status-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 24px;display:flex;gap:20px;align-items:flex-start;transition:border-color 0.2s;}
+  .status-card:hover{border-color:var(--border2);}
+  .status-badge{font-family:var(--mono);font-size:13px;font-weight:700;padding:6px 12px;border-radius:8px;flex-shrink:0;min-width:52px;text-align:center;}
+  .s2xx{background:var(--green-dim);color:var(--green);border:1px solid #00e5a025;}
+  .s4xx{background:var(--yellow-dim);color:var(--yellow);border:1px solid #f5c54225;}
+  .s401{background:var(--red-dim);color:var(--red);border:1px solid #ff4d6a25;}
+  .s429{background:var(--red-dim);color:var(--red);border:1px solid #ff4d6a25;}
+  .s5xx{background:var(--red-dim);color:var(--red);border:1px solid #ff4d6a25;}
+  .status-info{flex:1;}
+  .status-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;}
+  .status-desc{font-size:13px;color:var(--text2);line-height:1.6;}
+
+  /* ERROR CODES TABLE */
+  .error-table{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:20px;}
+  .error-table th{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);padding:12px 20px;text-align:left;background:var(--bg2);border-bottom:1px solid var(--border);}
+  .error-table td{padding:13px 20px;font-size:13px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:top;}
+  .error-table tr:last-child td{border-bottom:none;}
+  .error-table tr:hover td{background:var(--border);}
+  .error-code-cell{font-family:var(--mono);font-size:11px;color:var(--red);}
+  .http-cell{font-family:var(--mono);font-size:11px;color:var(--text3);}
+
+  .code-block{background:var(--bg);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:16px;}
+  .code-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border);}
+  .code-lang{font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:0.1em;text-transform:uppercase;}
+  .code-copy{font-family:var(--mono);font-size:9px;color:var(--text3);background:none;border:1px solid var(--border2);padding:2px 8px;border-radius:4px;cursor:pointer;transition:all 0.15s;}
+  .code-copy:hover{color:var(--text);border-color:var(--accent);}
+  pre{padding:18px;font-family:var(--mono);font-size:12.5px;line-height:1.75;overflow-x:auto;color:var(--text2);}
+  .k{color:var(--accent2);}.s{color:var(--green);}.c{color:var(--text3);font-style:italic;}.v{color:var(--yellow);}.err{color:var(--red);}
+
+  .info-note{display:flex;gap:12px;background:var(--accent-glow);border:1px solid #6c63ff25;border-radius:10px;padding:14px 18px;font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:20px;}
+  code{font-family:var(--mono);font-size:11px;color:var(--accent2);background:var(--accent-glow);padding:1px 5px;border-radius:3px;}
+
+  .mobile-menu-btn{display:none;}
+  @media(max-width:768px){
+    body{flex-direction:column;}
+    aside{width:100%;min-width:unset;height:auto;position:relative;border-right:none;border-bottom:1px solid var(--border);}
+    aside nav{display:none;}
+    aside.open nav{display:block;}
+    .mobile-menu-btn{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--text2);background:none;border:1px solid var(--border2);padding:6px 12px;border-radius:6px;cursor:pointer;margin:12px 24px;font-family:var(--sans);}
+    .topbar{left:0;position:relative;padding:0 20px;}
+    .search-bar{width:100%;}
+    .topbar-links{display:none;}
+    main{padding:32px 20px 60px;max-width:100%;}
+    h1{font-size:30px;}
+    .status-card{flex-direction:column;gap:10px;}
+  }
+
+  ::-webkit-scrollbar{width:4px;} ::-webkit-scrollbar-track{background:transparent;} ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+</style>
+</head>
+<body>
+
+<aside id="sidebar">
+  <div class="logo">
+    <a class="logo-mark" href="/"><div class="logo-icon"></div><span class="logo-text">STAARK<span>.</span></span></a>
+    <div class="version-badge">v1.4.2 — stable</div>
+  </div>
+  <button class="mobile-menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰ Menu</button>
+  <nav>
+    <div class="nav-label">Getting Started</div>
+    <a class="nav-link" href="/">Introduction</a>
+    <a class="nav-link" href="/authentication"><div class="nav-dot" style="background:#5a5a7a"></div>Authentication</a>
+    <a class="nav-link" href="/rate-limits"><div class="nav-dot" style="background:#5a5a7a"></div>Rate Limits</a>
+    <a class="nav-link active" href="/errors"><div class="nav-dot" style="background:#6c63ff"></div>Errors</a>
+    <div class="nav-label">Projects</div>
+    <a class="nav-link" href="/"><div class="nav-dot" style="background:#00e5a0"></div>List Projects<span class="method-tag tag-get">GET</span></a>
+    <a class="nav-link" href="/"><div class="nav-dot" style="background:#38b2f4"></div>Create Project<span class="method-tag tag-post">POST</span></a>
+    <div class="nav-label">Tasks</div>
+    <a class="nav-link" href="/"><div class="nav-dot" style="background:#00e5a0"></div>List Tasks<span class="method-tag tag-get">GET</span></a>
+    <a class="nav-link" href="/"><div class="nav-dot" style="background:#38b2f4"></div>Create Task<span class="method-tag tag-post">POST</span></a>
+    <div class="nav-label">Webhooks</div>
+    <a class="nav-link" href="/"><div class="nav-dot" style="background:#38b2f4"></div>Register Webhook<span class="method-tag tag-post">POST</span></a>
+  </nav>
+</aside>
+
+<div class="topbar">
+  <div class="search-bar"><span style="color:var(--text3)">⌕</span><input type="text" placeholder="Search endpoints..."></div>
+  <div class="topbar-links">
+    <a class="topbar-link" href="/changelog">Changelog</a>
+    <a class="topbar-link" href="/sdks">SDKs</a>
+    <a class="topbar-link" href="/status">Status</a>
+  </div>
+  <a class="topbar-cta" href="/v1/get-key">Get API Key →</a>
+</div>
+
+<main>
+  <div class="page-eyebrow">Getting Started</div>
+  <h1>Error Handling</h1>
+  <p class="page-desc">The Staark API uses conventional HTTP response codes to indicate the success or failure of a request. Errors include a machine-readable code and a human-readable message.</p>
+
+  <!-- ERROR SHAPE -->
+  <div class="section">
+    <h2>Error response format</h2>
+    <p style="font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:20px">All errors return a consistent JSON structure with an <code>error</code> object:</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">JSON</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+      <pre>{
+  <span class="k">"error"</span>: {
+    <span class="k">"code"</span>: <span class="err">"VALIDATION_ERROR"</span>,        <span class="c">// machine-readable code</span>
+    <span class="k">"message"</span>: <span class="s">"'title' is required"</span>,    <span class="c">// human-readable description</span>
+    <span class="k">"field"</span>: <span class="s">"title"</span>,                  <span class="c">// field that caused the error (if applicable)</span>
+    <span class="k">"docs"</span>: <span class="s">"https://api.staark-app.cloud/errors"</span>
+  }
+}</pre>
+    </div>
+  </div>
+
+  <!-- HTTP STATUS CODES -->
+  <div class="section">
+    <h2>HTTP status codes</h2>
+    <div class="status-grid">
+      <div class="status-card">
+        <div class="status-badge s2xx">2xx</div>
+        <div class="status-info">
+          <div class="status-title">Success</div>
+          <div class="status-desc"><code>200 OK</code> for reads, <code>201 Created</code> for successful creates. The request was processed successfully.</div>
+        </div>
+      </div>
+      <div class="status-card">
+        <div class="status-badge s4xx">400</div>
+        <div class="status-info">
+          <div class="status-title">Bad Request</div>
+          <div class="status-desc">The request was malformed — missing required fields, invalid types, or failed validation. Check the <code>field</code> property in the error response.</div>
+        </div>
+      </div>
+      <div class="status-card">
+        <div class="status-badge s401">401</div>
+        <div class="status-info">
+          <div class="status-title">Unauthorized</div>
+          <div class="status-desc">Missing or invalid API key. Make sure your <code>Authorization: Bearer</code> header is present and the key is valid.</div>
+        </div>
+      </div>
+      <div class="status-card">
+        <div class="status-badge s4xx">403</div>
+        <div class="status-info">
+          <div class="status-title">Forbidden</div>
+          <div class="status-desc">Your API key does not have permission to perform this action. Check the key's workspace scope.</div>
+        </div>
+      </div>
+      <div class="status-card">
+        <div class="status-badge s4xx">404</div>
+        <div class="status-info">
+          <div class="status-title">Not Found</div>
+          <div class="status-desc">The requested resource does not exist or was deleted. Double-check the ID in the URL path.</div>
+        </div>
+      </div>
+      <div class="status-card">
+        <div class="status-badge s429">429</div>
+        <div class="status-info">
+          <div class="status-title">Too Many Requests</div>
+          <div class="status-desc">Rate limit exceeded. Check the <code>Retry-After</code> header and implement exponential backoff. See <a href="/rate-limits" style="color:var(--accent2);text-decoration:none">Rate Limits</a>.</div>
+        </div>
+      </div>
+      <div class="status-card">
+        <div class="status-badge s5xx">5xx</div>
+        <div class="status-info">
+          <div class="status-title">Server Error</div>
+          <div class="status-desc">Something went wrong on our end. These are rare — check the <a href="/status" style="color:var(--accent2);text-decoration:none">Status page</a> for ongoing incidents and retry with backoff.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ERROR CODES -->
+  <div class="section">
+    <h2>Error codes reference</h2>
+    <table class="error-table">
+      <tr><th>Code</th><th>HTTP</th><th>Description</th></tr>
+      <tr>
+        <td class="error-code-cell">UNAUTHORIZED</td>
+        <td class="http-cell">401</td>
+        <td>API key is missing or invalid</td>
+      </tr>
+      <tr>
+        <td class="error-code-cell">FORBIDDEN</td>
+        <td class="http-cell">403</td>
+        <td>Key does not have access to this resource</td>
+      </tr>
+      <tr>
+        <td class="error-code-cell">NOT_FOUND</td>
+        <td class="http-cell">404</td>
+        <td>Resource with given ID does not exist</td>
+      </tr>
+      <tr>
+        <td class="error-code-cell">VALIDATION_ERROR</td>
+        <td class="http-cell">400</td>
+        <td>Request body failed schema validation</td>
+      </tr>
+      <tr>
+        <td class="error-code-cell">MISSING_FIELD</td>
+        <td class="http-cell">400</td>
+        <td>A required field was not provided</td>
+      </tr>
+      <tr>
+        <td class="error-code-cell">INVALID_TYPE</td>
+        <td class="http-cell">400</td>
+        <td>Field value is the wrong type</td>
+      </tr>
+      <tr>
+        <td class="error-code-cell">RATE_LIMIT_EXCEEDED</td>
+        <td class="http-cell">429</td>
+        <td>Too many requests in the current window</td>
+      </tr>
+      <tr>
+        <td class="error-code-cell">CONFLICT</td>
+        <td class="http-cell">409</td>
+        <td>Resource already exists or action conflicts with current state</td>
+      </tr>
+      <tr>
+        <td class="error-code-cell">INTERNAL_ERROR</td>
+        <td class="http-cell">500</td>
+        <td>Unexpected server error — retry with backoff</td>
+      </tr>
+      <tr>
+        <td class="error-code-cell">SERVICE_UNAVAILABLE</td>
+        <td class="http-cell">503</td>
+        <td>API is temporarily unavailable</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- HANDLING ERRORS -->
+  <div class="section">
+    <h2>Handling errors in code</h2>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Node.js</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+      <pre><span class="k">const</span> res = <span class="k">await</span> fetch(<span class="s">'https://api.staark-app.cloud/v1/tasks'</span>, {
+  method: <span class="s">'POST'</span>,
+  headers: { <span class="s">'Authorization'</span>: <span class="s">`Bearer ${apiKey}`</span> },
+  body: JSON.stringify({ title: <span class="s">'New task'</span> })
+});
+
+<span class="k">if</span> (!res.ok) {
+  <span class="k">const</span> { error } = <span class="k">await</span> res.json();
+
+  <span class="k">switch</span> (error.code) {
+    <span class="k">case</span> <span class="s">'UNAUTHORIZED'</span>:
+      <span class="k">throw new</span> Error(<span class="s">'Invalid API key'</span>);
+    <span class="k">case</span> <span class="s">'RATE_LIMIT_EXCEEDED'</span>:
+      <span class="k">await</span> sleep(error.retry_after * <span class="v">1000</span>);
+      <span class="k">break</span>;
+    <span class="k">case</span> <span class="s">'VALIDATION_ERROR'</span>:
+      console.error(<span class="s">`Field error: ${error.field} — ${error.message}`</span>);
+      <span class="k">break</span>;
+    <span class="k">default</span>:
+      <span class="k">throw new</span> Error(error.message);
+  }
+}</pre>
+    </div>
+
+    <div class="info-note">
+      <span>ℹ</span>
+      <div>For <code>5xx</code> errors, always retry with exponential backoff — start with 1s, then 2s, 4s, up to a maximum of 60s. Most transient server errors resolve within a few seconds.</div>
+    </div>
+  </div>
+</main>
+
+<script>
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    btn.textContent = 'Copied!';
+    btn.style.color = 'var(--green)';
+    setTimeout(() => { btn.textContent = 'Copy'; btn.style.color = ''; }, 1800);
+  });
+}
+</script>
+</body>
+</html>

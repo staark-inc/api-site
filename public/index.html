@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staark API — Documentation</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/style.css" />
+  </head>
+  <body>
+
+    <!-- SIDEBAR -->
+    <aside>
+      <div class="logo">
+        <a class="logo-mark" href="/">
+          <div class="logo-icon"></div>
+          <span class="logo-text">STAARK<span>.</span></span>
+        </a>
+        <div class="version-badge">v1.4.2 — stable</div>
+      </div>
+
+      <nav>
+        <div class="nav-section">
+          <div class="nav-label">Getting Started</div>
+          <a class="nav-link active">
+            <div class="nav-dot" style="background:#6c63ff"></div>
+            Introduction
+          </a>
+          <a href="./authentication" class="nav-link">
+            <div class="nav-dot" style="background:#5a5a7a"></div>
+            Authentication
+          </a>
+          <a href="./rate-limits" class="nav-link">
+            <div class="nav-dot" style="background:#5a5a7a"></div>
+            Rate Limits
+          </a>
+          <a href="./errors" class="nav-link">
+            <div class="nav-dot" style="background:#5a5a7a"></div>
+            Errors
+          </a>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-label">Projects</div>
+          <a class="nav-link">
+            <div class="nav-dot" style="background:#00e5a0"></div>
+            List Projects
+            <span class="method-tag tag-get">GET</span>
+          </a>
+          <a class="nav-link">
+            <div class="nav-dot" style="background:#38b2f4"></div>
+            Create Project
+            <span class="method-tag tag-post">POST</span>
+          </a>
+          <a class="nav-link">
+            <div class="nav-dot" style="background:#00e5a0"></div>
+            Get Project
+            <span class="method-tag tag-get">GET</span>
+          </a>
+          <a class="nav-link">
+            <div class="nav-dot" style="background:#f5c542"></div>
+            Update Project
+            <span class="method-tag tag-put">PUT</span>
+          </a>
+          <a class="nav-link">
+            <div class="nav-dot" style="background:#ff4d6a"></div>
+            Delete Project
+            <span class="method-tag tag-delete">DEL</span>
+          </a>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-label">Tasks</div>
+          <a class="nav-link">
+            <div class="nav-dot" style="background:#00e5a0"></div>
+            List Tasks
+            <span class="method-tag tag-get">GET</span>
+          </a>
+          <a class="nav-link">
+            <div class="nav-link" style="padding:0">
+            <div class="nav-dot" style="background:#38b2f4"></div>
+            Create Task
+            <span class="method-tag tag-post">POST</span>
+            </div>
+          </a>
+          <a class="nav-link">
+            <div class="nav-dot" style="background:#f5c542"></div>
+            Update Task
+            <span class="method-tag tag-put">PUT</span>
+          </a>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-label">Team</div>
+          <a class="nav-link">
+            <div class="nav-dot" style="background:#00e5a0"></div>
+            List Members
+            <span class="method-tag tag-get">GET</span>
+          </a>
+          <a class="nav-link">
+            <div class="nav-dot" style="background:#38b2f4"></div>
+            Invite Member
+            <span class="method-tag tag-post">POST</span>
+          </a>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-label">Webhooks</div>
+          <a class="nav-link">
+            <div class="nav-dot" style="background:#38b2f4"></div>
+            Register Webhook
+            <span class="method-tag tag-post">POST</span>
+          </a>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-label">SSH Connections <span style="font-size:9px;background:#00e5a018;color:#00e5a0;border:1px solid #00e5a030;padding:1px 5px;border-radius:3px;font-family:var(--mono);letter-spacing:0.08em;vertical-align:middle">NEW</span></div>
+          <a class="nav-link">
+            <div class="nav-dot" style="background:#00e5a0"></div>
+            List Connections
+            <span class="method-tag tag-get">GET</span>
+          </a>
+          <a class="nav-link">
+            <div class="nav-dot" style="background:#f5c542"></div>
+            Upsert Connection
+            <span class="method-tag tag-put">PUT</span>
+          </a>
+          <a class="nav-link">
+            <div class="nav-dot" style="background:#ff4d6a"></div>
+            Delete Connection
+            <span class="method-tag tag-delete">DEL</span>
+          </a>
+          <a class="nav-link">
+            <div class="nav-dot" style="background:#38b2f4"></div>
+            Bulk Sync
+            <span class="method-tag tag-post">POST</span>
+          </a>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- TOP BAR -->
+    <div class="topbar">
+      <div class="search-bar">
+        <span class="search-icon">⌕</span>
+        <input type="text" placeholder="Search endpoints...">
+      </div>
+      <div class="topbar-links">
+        <a class="topbar-link" href="/changelog">Changelog</a>
+        <a class="topbar-link" href="/sdks">SDKs</a>
+        <a class="topbar-link" href="/status">Status</a>
+      </div>
+      <a class="topbar-cta" href="/v1/get-key">Get API Key →</a>
+    </div>
+
+    <!-- MAIN -->
+    <main>
+
+      <!-- Hero -->
+      <div class="hero">
+        <div class="hero-eyebrow">REST API · v1</div>
+        <h1>Staark<br>API Docs</h1>
+        <p class="hero-desc">
+          Build on top of Staark's project management infrastructure. 
+          Manage projects, tasks, sprints, and teams programmatically with our REST API.
+        </p>
+        <div class="base-url-block">
+          <div class="base-url-label">Base URL</div>
+          <div class="base-url-value">https://api.staark-app.cloud/v1</div>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-value" style="color:var(--green)">32</div>
+          <div class="stat-label">Endpoints</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" style="color:var(--blue)">99.9%</div>
+          <div class="stat-label">Uptime SLA</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" style="color:var(--accent2)">5k</div>
+          <div class="stat-label">Req / min</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" style="color:var(--yellow)">JSON</div>
+          <div class="stat-label">Format</div>
+        </div>
+      </div>
+
+      <!-- Authentication -->
+      <div class="section">
+        <div class="section-header">
+          <span class="section-num">01</span>
+          <h2>Authentication</h2>
+          <div class="section-line"></div>
+        </div>
+
+        <div class="auth-card">
+          <div class="auth-title">Bearer Token</div>
+          <div class="auth-desc">
+            All API requests must include your API key as a Bearer token in the <code style="font-family:var(--mono);color:var(--accent2);font-size:12px">Authorization</code> header.
+            Keys are scoped per workspace and can be generated from the dashboard.
+          </div>
+          <div class="body-label">Example Header</div>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-lang">HTTP</span>
+              <button class="code-copy" onclick="copyCode(this, 'Authorization: Bearer sk_live_staark_••••••••••••••••')">Copy</button>
+            </div>
+            <pre><span class="k">Authorization</span>: Bearer <span class="s">sk_live_staark_••••••••••••••••</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Projects Endpoints -->
+      <div class="section">
+        <div class="section-header">
+          <span class="section-num">02</span>
+          <h2>Projects</h2>
+          <div class="section-line"></div>
+        </div>
+
+        <div class="info-note" style="margin-bottom:20px">
+          <span class="info-icon">ℹ</span>
+          Projects are the top-level container for tasks, sprints, and team members in Staark.
+        </div>
+
+        <!-- GET /projects -->
+        <div class="endpoint-card" onclick="toggleEndpoint(this)">
+          <div class="endpoint-header">
+            <span class="method-badge tag-get">GET</span>
+            <span class="endpoint-path">/projects</span>
+            <span class="endpoint-summary">List all projects</span>
+            <span class="chevron">▶</span>
+          </div>
+          <div class="endpoint-body">
+            <div>
+              <div class="body-label">Query Parameters</div>
+              <table class="param-table">
+                <tr>
+                  <th>Name</th><th>Type</th><th>Required</th><th>Description</th>
+                </tr>
+                <tr>
+                  <td class="param-name">workspace_id</td>
+                  <td class="param-type">string</td>
+                  <td class="param-req">required</td>
+                  <td class="param-desc">Workspace UUID to filter projects</td>
+                </tr>
+                <tr>
+                  <td class="param-name">status</td>
+                  <td class="param-type">enum</td>
+                  <td class="param-opt">optional</td>
+                  <td class="param-desc">Filter by status: <code style="color:var(--accent2);font-family:var(--mono);font-size:11px">active</code>, <code style="color:var(--accent2);font-family:var(--mono);font-size:11px">archived</code>, <code style="color:var(--accent2);font-family:var(--mono);font-size:11px">completed</code></td>
+                </tr>
+                <tr>
+                  <td class="param-name">limit</td>
+                  <td class="param-type">integer</td>
+                  <td class="param-opt">optional</td>
+                  <td class="param-desc">Max results per page (default: 20, max: 100)</td>
+                </tr>
+              </table>
+            </div>
+            <div>
+              <div class="body-label">Response</div>
+              <div class="code-block">
+                <div class="code-header">
+                  <span class="code-lang">JSON</span>
+                  <button class="code-copy" onclick="copyCode(this, '')">Copy</button>
+                </div>
+                <pre>{
+      <span class="k">"data"</span>: [
+        {
+          <span class="k">"id"</span>: <span class="s">"proj_01hq4m8xkz"</span>,
+          <span class="k">"name"</span>: <span class="s">"Q2 Product Launch"</span>,
+          <span class="k">"status"</span>: <span class="s">"active"</span>,
+          <span class="k">"task_count"</span>: <span class="v">48</span>,
+          <span class="k">"created_at"</span>: <span class="s">"2024-03-01T10:00:00Z"</span>
+        }
+      ],
+      <span class="k">"meta"</span>: { <span class="k">"total"</span>: <span class="v">12</span>, <span class="k">"page"</span>: <span class="v">1</span> }
+    }</pre>
+              </div>
+            </div>
+            <div>
+              <div class="body-label">Response Codes</div>
+              <div class="response-codes">
+                <div class="res-code res-200">200 OK</div>
+                <div class="res-code res-401">401 Unauthorized</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- POST /projects -->
+        <div class="endpoint-card" onclick="toggleEndpoint(this)">
+          <div class="endpoint-header">
+            <span class="method-badge tag-post">POST</span>
+            <span class="endpoint-path">/projects</span>
+            <span class="endpoint-summary">Create a new project</span>
+            <span class="chevron">▶</span>
+          </div>
+          <div class="endpoint-body">
+            <div>
+              <div class="body-label">Request Body</div>
+              <div class="code-block">
+                <div class="code-header">
+                  <span class="code-lang">JSON</span>
+                  <button class="code-copy" onclick="copyCode(this, '')">Copy</button>
+                </div>
+                <pre>{
+      <span class="k">"workspace_id"</span>: <span class="s">"ws_01hq4m8abc"</span>,   <span class="c">// required</span>
+      <span class="k">"name"</span>: <span class="s">"New Feature Sprint"</span>,       <span class="c">// required</span>
+      <span class="k">"description"</span>: <span class="s">"Q3 roadmap items"</span>,
+      <span class="k">"color"</span>: <span class="s">"#6c63ff"</span>,
+      <span class="k">"visibility"</span>: <span class="s">"private"</span>              <span class="c">// "private" | "public"</span>
+    }</pre>
+              </div>
+            </div>
+            <div>
+              <div class="body-label">Response Codes</div>
+              <div class="response-codes">
+                <div class="res-code res-201">201 Created</div>
+                <div class="res-code res-400">400 Bad Request</div>
+                <div class="res-code res-401">401 Unauthorized</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- GET /projects/:id -->
+        <div class="endpoint-card" onclick="toggleEndpoint(this)">
+          <div class="endpoint-header">
+            <span class="method-badge tag-get">GET</span>
+            <span class="endpoint-path">/projects/<span>{id}</span></span>
+            <span class="endpoint-summary">Get project by ID</span>
+            <span class="chevron">▶</span>
+          </div>
+          <div class="endpoint-body">
+            <div>
+              <div class="body-label">Path Parameters</div>
+              <table class="param-table">
+                <tr><th>Name</th><th>Type</th><th>Required</th><th>Description</th></tr>
+                <tr>
+                  <td class="param-name">id</td>
+                  <td class="param-type">string</td>
+                  <td class="param-req">required</td>
+                  <td class="param-desc">Project UUID (e.g. <code style="color:var(--accent2);font-family:var(--mono);font-size:11px">proj_01hq4m8xkz</code>)</td>
+                </tr>
+              </table>
+            </div>
+            <div>
+              <div class="body-label">Response Codes</div>
+              <div class="response-codes">
+                <div class="res-code res-200">200 OK</div>
+                <div class="res-code res-404">404 Not Found</div>
+                <div class="res-code res-401">401 Unauthorized</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tasks Endpoints -->
+      <div class="section">
+        <div class="section-header">
+          <span class="section-num">03</span>
+          <h2>Tasks</h2>
+          <div class="section-line"></div>
+        </div>
+
+        <!-- POST /tasks -->
+        <div class="endpoint-card" onclick="toggleEndpoint(this)">
+          <div class="endpoint-header">
+            <span class="method-badge tag-post">POST</span>
+            <span class="endpoint-path">/tasks</span>
+            <span class="endpoint-summary">Create a task</span>
+            <span class="chevron">▶</span>
+          </div>
+          <div class="endpoint-body">
+            <div>
+              <div class="body-label">Request Body</div>
+              <div class="code-block">
+                <div class="code-header">
+                  <span class="code-lang">JSON</span>
+                  <button class="code-copy" onclick="copyCode(this,'')">Copy</button>
+                </div>
+                <pre>{
+      <span class="k">"project_id"</span>: <span class="s">"proj_01hq4m8xkz"</span>,  <span class="c">// required</span>
+      <span class="k">"title"</span>: <span class="s">"Design onboarding flow"</span>,  <span class="c">// required</span>
+      <span class="k">"priority"</span>: <span class="s">"high"</span>,              <span class="c">// "low" | "medium" | "high" | "urgent"</span>
+      <span class="k">"assignee_id"</span>: <span class="s">"usr_01hq5xy"</span>,
+      <span class="k">"due_date"</span>: <span class="s">"2024-04-15"</span>,
+      <span class="k">"tags"</span>: [<span class="s">"design"</span>, <span class="s">"ux"</span>]
+    }</pre>
+              </div>
+            </div>
+            <div>
+              <div class="body-label">cURL Example</div>
+              <div class="code-block">
+                <div class="code-header">
+                  <span class="code-lang">cURL</span>
+                  <button class="code-copy" onclick="copyCode(this,'')">Copy</button>
+                </div>
+                <pre><span class="k">curl</span> -X POST https://api.staark-app.cloud/v1/tasks \
+      -H <span class="s">"Authorization: Bearer sk_live_staark_••••"</span> \
+      -H <span class="s">"Content-Type: application/json"</span> \
+      -d <span class="s">'{"project_id":"proj_01hq4m8xkz","title":"Design onboarding flow"}'</span></pre>
+              </div>
+            </div>
+            <div>
+              <div class="body-label">Response Codes</div>
+              <div class="response-codes">
+                <div class="res-code res-201">201 Created</div>
+                <div class="res-code res-400">400 Bad Request</div>
+                <div class="res-code res-401">401 Unauthorized</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PUT /tasks/:id -->
+        <div class="endpoint-card" onclick="toggleEndpoint(this)">
+          <div class="endpoint-header">
+            <span class="method-badge tag-put">PUT</span>
+            <span class="endpoint-path">/tasks/<span>{id}</span></span>
+            <span class="endpoint-summary">Update task fields</span>
+            <span class="chevron">▶</span>
+          </div>
+          <div class="endpoint-body">
+            <div>
+              <div class="body-label">Path Parameters</div>
+              <table class="param-table">
+                <tr><th>Name</th><th>Type</th><th>Required</th><th>Description</th></tr>
+                <tr>
+                  <td class="param-name">id</td>
+                  <td class="param-type">string</td>
+                  <td class="param-req">required</td>
+                  <td class="param-desc">Task UUID</td>
+                </tr>
+              </table>
+            </div>
+            <div>
+              <div class="body-label">Response Codes</div>
+              <div class="response-codes">
+                <div class="res-code res-200">200 OK</div>
+                <div class="res-code res-404">404 Not Found</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Webhooks -->
+      <div class="section">
+        <div class="section-header">
+          <span class="section-num">04</span>
+          <h2>Webhooks</h2>
+          <div class="section-line"></div>
+        </div>
+
+        <div class="info-note" style="margin-bottom:20px">
+          <span class="info-icon">ℹ</span>
+          Webhooks deliver real-time event notifications to your endpoint whenever something changes in Staark — tasks updated, members invited, sprints closed, and more.
+        </div>
+
+        <div class="endpoint-card" onclick="toggleEndpoint(this)">
+          <div class="endpoint-header">
+            <span class="method-badge tag-post">POST</span>
+            <span class="endpoint-path">/webhooks</span>
+            <span class="endpoint-summary">Register webhook</span>
+            <span class="chevron">▶</span>
+          </div>
+          <div class="endpoint-body">
+            <div>
+              <div class="body-label">Request Body</div>
+              <div class="code-block">
+                <div class="code-header">
+                  <span class="code-lang">JSON</span>
+                  <button class="code-copy" onclick="copyCode(this,'')">Copy</button>
+                </div>
+                <pre>{
+      <span class="k">"url"</span>: <span class="s">"https://your-app.com/webhook"</span>,
+      <span class="k">"events"</span>: [
+        <span class="s">"task.created"</span>,
+        <span class="s">"task.updated"</span>,
+        <span class="s">"project.archived"</span>,
+        <span class="s">"member.invited"</span>
+      ],
+      <span class="k">"secret"</span>: <span class="s">"whsec_••••••••"</span>  <span class="c">// for HMAC verification</span>
+    }</pre>
+              </div>
+            </div>
+            <div>
+              <div class="body-label">Response Codes</div>
+              <div class="response-codes">
+                <div class="res-code res-201">201 Created</div>
+                <div class="res-code res-400">400 Bad Request</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SSH Connections -->
+      <div class="section">
+        <div class="section-header">
+          <span class="section-num">05</span>
+          <h2>SSH Connections</h2>
+          <div class="section-line"></div>
+        </div>
+
+        <div class="info-note" style="margin-bottom:20px">
+          <span class="info-icon">ℹ</span>
+          Store and sync SSH connection profiles across devices via the Staark API. Used by <strong>Staark SSH</strong> for cloud sync. Each connection is identified by a client-generated UUID and stores all config in an encrypted <code style="font-family:var(--mono);color:var(--accent2);font-size:11px">data</code> field.
+        </div>
+
+        <!-- GET /ssh/connections -->
+        <div class="endpoint-card" onclick="toggleEndpoint(this)">
+          <div class="endpoint-header">
+            <span class="method-badge tag-get">GET</span>
+            <span class="endpoint-path">/ssh/connections</span>
+            <span class="endpoint-summary">List saved connections</span>
+            <span class="chevron">▶</span>
+          </div>
+          <div class="endpoint-body">
+            <div>
+              <div class="body-label">Response</div>
+              <div class="code-block">
+                <div class="code-header">
+                  <span class="code-lang">JSON</span>
+                  <button class="code-copy" onclick="copyCode(this,'')">Copy</button>
+                </div>
+                <pre>{
+  <span class="k">"ok"</span>: <span class="v">true</span>,
+  <span class="k">"connections"</span>: [
+    {
+      <span class="k">"id"</span>: <span class="s">"550e8400-e29b-41d4-a716-446655440000"</span>,
+      <span class="k">"name"</span>: <span class="s">"Production Server"</span>,
+      <span class="k">"host"</span>: <span class="s">"192.168.0.10"</span>,
+      <span class="k">"port"</span>: <span class="v">22</span>,
+      <span class="k">"username"</span>: <span class="s">"debian"</span>,
+      <span class="k">"auth_type"</span>: <span class="s">"key"</span>,
+      <span class="k">"sort_order"</span>: <span class="v">0</span>,
+      <span class="k">"updated_at"</span>: <span class="s">"2026-03-30T11:00:00.000Z"</span>
+    }
+  ]
+}</pre>
+              </div>
+            </div>
+            <div>
+              <div class="body-label">Response Codes</div>
+              <div class="response-codes">
+                <div class="res-code res-200">200 OK</div>
+                <div class="res-code res-401">401 Unauthorized</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PUT /ssh/connections/:id -->
+        <div class="endpoint-card" onclick="toggleEndpoint(this)">
+          <div class="endpoint-header">
+            <span class="method-badge tag-put">PUT</span>
+            <span class="endpoint-path">/ssh/connections/<span>{id}</span></span>
+            <span class="endpoint-summary">Create or update a connection</span>
+            <span class="chevron">▶</span>
+          </div>
+          <div class="endpoint-body">
+            <div>
+              <div class="body-label">Path Parameters</div>
+              <table class="param-table">
+                <tr><th>Name</th><th>Type</th><th>Required</th><th>Description</th></tr>
+                <tr>
+                  <td class="param-name">id</td>
+                  <td class="param-type">string</td>
+                  <td class="param-req">required</td>
+                  <td class="param-desc">Client-generated UUID for the connection</td>
+                </tr>
+              </table>
+            </div>
+            <div>
+              <div class="body-label">Request Body</div>
+              <div class="code-block">
+                <div class="code-header">
+                  <span class="code-lang">JSON</span>
+                  <button class="code-copy" onclick="copyCode(this,'')">Copy</button>
+                </div>
+                <pre>{
+  <span class="k">"name"</span>: <span class="s">"Production Server"</span>,       <span class="c">// display name</span>
+  <span class="k">"host"</span>: <span class="s">"192.168.0.10"</span>,
+  <span class="k">"port"</span>: <span class="v">22</span>,
+  <span class="k">"username"</span>: <span class="s">"debian"</span>,
+  <span class="k">"auth_type"</span>: <span class="s">"key"</span>,              <span class="c">// "password" | "key" | "agent"</span>
+  <span class="k">"data"</span>: <span class="s">"{ ...encrypted connection config... }"</span>,
+  <span class="k">"sort_order"</span>: <span class="v">0</span>
+}</pre>
+              </div>
+            </div>
+            <div>
+              <div class="body-label">Response Codes</div>
+              <div class="response-codes">
+                <div class="res-code res-200">200 OK</div>
+                <div class="res-code res-400">400 Bad Request</div>
+                <div class="res-code res-401">401 Unauthorized</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DELETE /ssh/connections/:id -->
+        <div class="endpoint-card" onclick="toggleEndpoint(this)">
+          <div class="endpoint-header">
+            <span class="method-badge tag-delete">DEL</span>
+            <span class="endpoint-path">/ssh/connections/<span>{id}</span></span>
+            <span class="endpoint-summary">Delete a connection</span>
+            <span class="chevron">▶</span>
+          </div>
+          <div class="endpoint-body">
+            <div>
+              <div class="body-label">Path Parameters</div>
+              <table class="param-table">
+                <tr><th>Name</th><th>Type</th><th>Required</th><th>Description</th></tr>
+                <tr>
+                  <td class="param-name">id</td>
+                  <td class="param-type">string</td>
+                  <td class="param-req">required</td>
+                  <td class="param-desc">Connection UUID to delete</td>
+                </tr>
+              </table>
+            </div>
+            <div>
+              <div class="body-label">Response Codes</div>
+              <div class="response-codes">
+                <div class="res-code res-200">200 OK</div>
+                <div class="res-code res-404">404 Not Found</div>
+                <div class="res-code res-401">401 Unauthorized</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- POST /ssh/connections/sync -->
+        <div class="endpoint-card" onclick="toggleEndpoint(this)">
+          <div class="endpoint-header">
+            <span class="method-badge tag-post">POST</span>
+            <span class="endpoint-path">/ssh/connections/sync</span>
+            <span class="endpoint-summary">Bulk sync — push all connections at once</span>
+            <span class="chevron">▶</span>
+          </div>
+          <div class="endpoint-body">
+            <div>
+              <div class="body-label">Request Body</div>
+              <div class="code-block">
+                <div class="code-header">
+                  <span class="code-lang">JSON</span>
+                  <button class="code-copy" onclick="copyCode(this,'')">Copy</button>
+                </div>
+                <pre>{
+  <span class="k">"connections"</span>: [
+    {
+      <span class="k">"id"</span>: <span class="s">"550e8400-e29b-41d4-a716-446655440000"</span>,
+      <span class="k">"name"</span>: <span class="s">"Production Server"</span>,
+      <span class="k">"host"</span>: <span class="s">"192.168.0.10"</span>,
+      <span class="k">"port"</span>: <span class="v">22</span>,
+      <span class="k">"username"</span>: <span class="s">"debian"</span>,
+      <span class="k">"auth_type"</span>: <span class="s">"key"</span>,
+      <span class="k">"data"</span>: <span class="s">"{ ...encrypted config... }"</span>,
+      <span class="k">"sort_order"</span>: <span class="v">0</span>
+    }
+  ]
+}</pre>
+              </div>
+            </div>
+            <div>
+              <div class="body-label">cURL Example</div>
+              <div class="code-block">
+                <div class="code-header">
+                  <span class="code-lang">cURL</span>
+                  <button class="code-copy" onclick="copyCode(this,'')">Copy</button>
+                </div>
+                <pre><span class="k">curl</span> -X POST https://api.staark-app.cloud/v1/ssh/connections/sync \
+  -H <span class="s">"Authorization: Bearer sk_live_staark_••••"</span> \
+  -H <span class="s">"Content-Type: application/json"</span> \
+  -d <span class="s">'{"connections":[...]}'</span></pre>
+              </div>
+            </div>
+            <div>
+              <div class="body-label">Response</div>
+              <div class="code-block">
+                <div class="code-header">
+                  <span class="code-lang">JSON</span>
+                  <button class="code-copy" onclick="copyCode(this,'')">Copy</button>
+                </div>
+                <pre>{ <span class="k">"ok"</span>: <span class="v">true</span>, <span class="k">"synced"</span>: <span class="v">3</span> }</pre>
+              </div>
+            </div>
+            <div>
+              <div class="body-label">Response Codes</div>
+              <div class="response-codes">
+                <div class="res-code res-200">200 OK</div>
+                <div class="res-code res-400">400 Bad Request</div>
+                <div class="res-code res-401">401 Unauthorized</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+
+    <script>
+    function toggleEndpoint(card) {
+      const body = card.querySelector('.endpoint-body');
+      const isOpen = body.classList.contains('open');
+      // close all
+      document.querySelectorAll('.endpoint-body').forEach(b => b.classList.remove('open'));
+      document.querySelectorAll('.endpoint-card').forEach(c => c.classList.remove('open'));
+      if (!isOpen) {
+        body.classList.add('open');
+        card.classList.add('open');
+      }
+    }
+
+    function copyCode(btn, text) {
+      const pre = btn.closest('.code-block').querySelector('pre');
+      const content = text || pre.innerText;
+      navigator.clipboard.writeText(content).then(() => {
+        btn.textContent = 'Copied!';
+        btn.style.color = 'var(--green)';
+        btn.style.borderColor = 'var(--green)';
+        setTimeout(() => {
+          btn.textContent = 'Copy';
+          btn.style.color = '';
+          btn.style.borderColor = '';
+        }, 1800);
+      });
+    }
+
+    // Animate sections on load
+    document.querySelectorAll('.section').forEach((s, i) => {
+      s.style.animationDelay = `${0.1 * (i + 1)}s`;
+    });
+    </script>
+  </body>
+</html>

@@ -67,6 +67,4 @@ function apiLimiter(req, res, next) {
   })(req, res, next);
 }
 
-export { PLAN_LIMITS };
-
 export { rateLimiter, generateKeyLimiter, authLimiter, apiLimiter, PLAN_LIMITS };

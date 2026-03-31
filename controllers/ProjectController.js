@@ -1,4 +1,5 @@
 import ProjectService from '../services/ProjectService.js';
+import AuditService   from '../services/AuditService.js';
 
 class ProjectsController {
 
@@ -54,6 +55,8 @@ class ProjectsController {
 
       const project = await ProjectService.create({ workspace_id, name: name.trim(), description, color, visibility });
 
+      AuditService.log(req.auth.user_id, 'project.created', 'project', project.id, { name: project.name }, req.ip);
+
       return res.status(201).json({ ok: true, data: project });
     } catch (err) {
       next(err);
@@ -107,6 +110,8 @@ class ProjectsController {
         });
       }
 
+      AuditService.log(req.auth.user_id, 'project.updated', 'project', id, { fields: Object.keys(fields) }, req.ip);
+
       return res.json({ ok: true, data: project });
     } catch (err) {
       next(err);
@@ -128,6 +133,8 @@ class ProjectsController {
           error: { code: 'NOT_FOUND', message: `Project '${req.params.id}' not found` }
         });
       }
+
+      AuditService.log(req.auth.user_id, 'project.deleted', 'project', req.params.id, null, req.ip);
 
       return res.status(204).send();
     } catch (err) {

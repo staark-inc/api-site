@@ -252,6 +252,54 @@ function apiKeyCreatedTemplate(plan = 'free') {
   };
 }
 
+function keyExpiryWarningTemplate(keyName, daysLeft, expiresAt) {
+  const expiresDate = new Date(expiresAt * 1000).toLocaleDateString('en-GB', {
+    day: 'numeric', month: 'long', year: 'numeric',
+  });
+  const urgencyColor = daysLeft <= 2 ? '#e06070' : '#f97316';
+
+  return {
+    subject: `Your API key "${keyName}" expires in ${daysLeft} day${daysLeft !== 1 ? 's' : ''}`,
+    html: emailLayout({
+      title: 'API Key Expiry Warning',
+      preheader: `Your key "${keyName}" expires on ${expiresDate}.`,
+      content: `
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+          style="max-width:640px;width:100%;background:#111322;border:1px solid #23263a;border-radius:18px;">
+          <tr>
+            <td style="padding:36px 32px 28px 32px;text-align:center;">
+
+              <div style="width:64px;height:64px;line-height:64px;margin:0 auto 18px auto;border-radius:50%;background:#2a1a0e;border:1px solid #5b3010;color:${urgencyColor};font-size:30px;">
+                &#9888;
+              </div>
+
+              <h1 style="margin:0 0 10px 0;font-size:28px;line-height:1.2;color:#ffffff;font-weight:800;">
+                API key expiring soon
+              </h1>
+
+              <p style="margin:0 0 14px 0;font-size:14px;line-height:1.6;color:#c8cbe0;">
+                Your key <strong style="color:#fff;">"${keyName}"</strong> will expire in
+                <strong style="color:${urgencyColor};">${daysLeft} day${daysLeft !== 1 ? 's' : ''}</strong>
+                on ${expiresDate}.
+              </p>
+
+              <p style="margin:0 0 28px 0;font-size:14px;line-height:1.6;color:#9aa0ba;">
+                To avoid interruptions, generate a new API key before it expires.
+              </p>
+
+              <a href="${BASE_URL}/dashboard/keys"
+                style="display:inline-block;padding:14px 22px;border-radius:10px;background:#6c63ff;color:#ffffff;text-decoration:none;font-size:14px;font-weight:700;">
+                Manage API Keys
+              </a>
+
+            </td>
+          </tr>
+        </table>
+      `,
+    }),
+  };
+}
+
 // ─── Send helpers ──────────────────────────────────────────────────────────
 
 async function sendVerifyEmail(to, displayName, token) {
@@ -269,8 +317,14 @@ async function sendApiKeyCreated(to, plan) {
   await transporter.sendMail({ from: FROM, to, subject, html });
 }
 
+async function sendKeyExpiryWarning(to, keyName, daysLeft, expiresAt) {
+  const { subject, html } = keyExpiryWarningTemplate(keyName, daysLeft, expiresAt);
+  await transporter.sendMail({ from: FROM, to, subject, html });
+}
+
 export default {
   sendVerifyEmail,
   sendPasswordReset,
   sendApiKeyCreated,
+  sendKeyExpiryWarning,
 };

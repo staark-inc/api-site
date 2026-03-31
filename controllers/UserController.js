@@ -1,5 +1,6 @@
-import UserService  from '../services/UserService.js';
-import EmailService from '../services/EmailService.js';
+import UserService   from '../services/UserService.js';
+import EmailService  from '../services/EmailService.js';
+import AuditService  from '../services/AuditService.js';
 
 class UserController {
 
@@ -25,6 +26,8 @@ class UserController {
 
       const { user, verifyToken } = await UserService.register({ email, password, firstName, lastName, displayName });
 
+      AuditService.log(user.id, 'user.register', 'user', user.id, { email: user.email }, req.ip);
+
       // Send verification email (non-blocking)
       EmailService
         .sendVerifyEmail(user.email, user.display_name, verifyToken)
@@ -49,6 +52,8 @@ class UserController {
       if (!password) return res.status(400).json({ error: { code: 'MISSING_FIELD', message: "'password' is required", field: 'password' } });
 
       const result = await UserService.login({ email, password });
+
+      AuditService.log(result.user.id, 'user.login', 'user', result.user.id, null, req.ip);
 
       return res.json({ ok: true, ...result });
     } catch (err) {

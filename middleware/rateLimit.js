@@ -48,17 +48,25 @@ const authLimiter = rateLimiter({
   keyFn:    (req) => `auth:${req.ip}`,
 });
 
+const PLAN_LIMITS = {
+  free:       300,
+  pro:        2500,
+  enterprise: 5000,
+};
+
 function apiLimiter(req, res, next) {
   // @ts-ignore
   const plan = req.auth?.plan ?? 'free';
-  const max  = plan === 'pro' ? 5000 : 500;
+  const max  = PLAN_LIMITS[plan] ?? PLAN_LIMITS.free;
 
   return rateLimiter({
-    windowMs: plan === 'pro' ? 60_000 : 24 * 60 * 60 * 1000,
+    windowMs: 24 * 60 * 60 * 1000, // 24h window for all plans
     max,
     // @ts-ignore
     keyFn: () => `api:${req.auth?.key_id ?? req.ip}`,
   })(req, res, next);
 }
 
-export { rateLimiter, generateKeyLimiter, authLimiter, apiLimiter };
+export { PLAN_LIMITS };
+
+export { rateLimiter, generateKeyLimiter, authLimiter, apiLimiter, PLAN_LIMITS };

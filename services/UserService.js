@@ -125,13 +125,23 @@ async function login({ email, password }) {
     );
   }
 
-  const accessToken  = signAccess(user, workspaceId);
-  const refreshToken = await signRefresh(user.id);
-
   await db.run(
     `UPDATE users SET updated_at = UNIX_TIMESTAMP() WHERE id = ?`,
     [user.id]
   );
+
+  // If 2FA enabled, issue a short-lived temp token
+  if (user.totp_enabled) {
+    const tempToken = jwt.sign(
+      { sub: user.id, scope: '2fa-pending', workspace_id: workspaceId },
+      JWT_SECRET,
+      { expiresIn: '5m' }
+    );
+    return { requires_2fa: true, temp_token: tempToken };
+  }
+
+  const accessToken  = signAccess(user, workspaceId);
+  const refreshToken = await signRefresh(user.id);
 
   return { user: sanitize(user), accessToken, refreshToken };
 }
@@ -264,6 +274,10 @@ function sanitize(user) {
   return safe;
 }
 
+async function createRefreshToken(userId) {
+  return signRefresh(userId);
+}
+
 export default {
   register,
   login,
@@ -273,4 +287,5 @@ export default {
   requestPasswordReset,
   resetPassword,
   createEmailToken,
+  createRefreshToken,
 };

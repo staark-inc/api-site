@@ -174,6 +174,46 @@ export async function up() {
     if (err.code !== 'ER_DUP_FIELDNAME') throw err;
   }
 
+  // ALTER users — oauth + totp columns
+  try {
+    await db.run(`ALTER TABLE users ADD COLUMN IF NOT EXISTS oauth_provider VARCHAR(32) DEFAULT NULL`);
+    await db.run(`ALTER TABLE users ADD COLUMN IF NOT EXISTS oauth_id VARCHAR(255) DEFAULT NULL`);
+    await db.run(`ALTER TABLE users ADD COLUMN IF NOT EXISTS totp_secret VARCHAR(64) DEFAULT NULL`);
+    await db.run(`ALTER TABLE users ADD COLUMN IF NOT EXISTS totp_enabled TINYINT(1) NOT NULL DEFAULT 0`);
+  } catch (err) {
+    if (err.code !== 'ER_DUP_FIELDNAME') throw err;
+  }
+
+  // user_webhooks table
+  await db.run(`
+    CREATE TABLE IF NOT EXISTS user_webhooks (
+      id          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+      user_id     VARCHAR(64) NOT NULL,
+      url         VARCHAR(512) NOT NULL,
+      secret      VARCHAR(128),
+      events      JSON NOT NULL,
+      active      TINYINT(1) NOT NULL DEFAULT 1,
+      created_at  BIGINT DEFAULT (UNIX_TIMESTAMP()),
+      INDEX idx_user (user_id)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+  `);
+
+  // webhook_deliveries table
+  await db.run(`
+    CREATE TABLE IF NOT EXISTS webhook_deliveries (
+      id           INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+      webhook_id   INT UNSIGNED NOT NULL,
+      event        VARCHAR(64) NOT NULL,
+      payload      JSON NOT NULL,
+      status       VARCHAR(16) NOT NULL DEFAULT 'pending',
+      http_status  SMALLINT,
+      response     TEXT,
+      duration_ms  INT,
+      delivered_at BIGINT DEFAULT (UNIX_TIMESTAMP()),
+      INDEX idx_webhook (webhook_id, delivered_at)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+  `);
+
   console.log('[migrate] all tables ready');
 }
 

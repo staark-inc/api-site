@@ -26,7 +26,9 @@ function computeExpiresAt(ttlDays) {
 
 // ─── Service ───────────────────────────────────────────────────────────────
 
-async function generate({ user_id, name, plan = 'free', ttl_days = DEFAULT_TTL_DAYS }) {
+const VALID_LABELS = ['production', 'development', 'read-only'];
+
+async function generate({ user_id, name, plan = 'free', label = 'development', ttl_days = DEFAULT_TTL_DAYS }) {
   const active = await db.get(
     `SELECT COUNT(*) as count FROM api_keys
      WHERE user_id = ? AND revoked = 0
@@ -46,10 +48,12 @@ async function generate({ user_id, name, plan = 'free', ttl_days = DEFAULT_TTL_D
   const keyHash   = await bcrypt.hash(rawKey, BCRYPT_ROUNDS);
   const expiresAt = computeExpiresAt(ttl_days);
 
+  const safeLabel = VALID_LABELS.includes(label) ? label : 'development';
+
   const result = await db.run(
-    `INSERT INTO api_keys (user_id, name, key_prefix, key_hash, plan, expires_at)
-     VALUES (?, ?, ?, ?, ?, ?)`,
-    [user_id, name ?? 'My API Key', keyPrefix, keyHash, plan, expiresAt]
+    `INSERT INTO api_keys (user_id, name, key_prefix, key_hash, plan, label, expires_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    [user_id, name ?? 'My API Key', keyPrefix, keyHash, plan, safeLabel, expiresAt]
   );
 
   return {
@@ -58,6 +62,7 @@ async function generate({ user_id, name, plan = 'free', ttl_days = DEFAULT_TTL_D
     key_prefix: keyPrefix,
     name:       name ?? 'My API Key',
     plan,
+    label:      safeLabel,
     expires_at: expiresAt,
     created_at: Math.floor(Date.now() / 1000),
   };
@@ -92,13 +97,19 @@ async function validate(rawKey) {
   return null;
 }
 
-async function list(user_id) {
+async function list(user_id, { label, plan } = {}) {
+  const conditions = ['user_id = ?'];
+  const params     = [user_id];
+
+  if (label) { conditions.push('label = ?'); params.push(label); }
+  if (plan)  { conditions.push('plan = ?');  params.push(plan);  }
+
   return db.all(
-    `SELECT id, name, key_prefix, plan, expires_at, last_used, revoked, created_at
+    `SELECT id, name, key_prefix, plan, label, expires_at, last_used, revoked, created_at
      FROM api_keys
-     WHERE user_id = ?
+     WHERE ${conditions.join(' AND ')}
      ORDER BY created_at DESC`,
-    [user_id]
+    params
   );
 }
 
@@ -119,4 +130,4 @@ async function revoke(id, user_id) {
   return { revoked: true };
 }
 
-export default { generate, validate, list, revoke };
+export default { generate, validate, list, revoke, VALID_LABELS };

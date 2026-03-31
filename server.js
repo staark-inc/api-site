@@ -13,8 +13,11 @@ import projectsRouter      from './routes/projects.js';
 import tasksRouter         from './routes/tasks.js';
 import authRouter          from './routes/auth.js';
 import sshConnectionsRouter from './routes/sshConnections.js';
+import auditRouter         from './routes/audit.js';
+import exportRouter        from './routes/export.js';
 
 import { collectPublicStatus } from './services/status.js';
+import EmailService from './services/EmailService.js';
 import db, { getDailyHistory } from './db.js';
 import { up as migrateInit } from './migrate/init.js';
 
@@ -43,6 +46,51 @@ async function scheduleStatusJob() {
     console.error('[status] Job error:', err.message);
   } finally {
     setTimeout(scheduleStatusJob, 5 * 60 * 1000);
+  }
+}
+
+// ─── Key expiry notification job (every 24h) ───────────────────────────────
+
+async function checkKeyExpiry() {
+  try {
+    const sevenDays = 7 * 86400;
+    const now       = Math.floor(Date.now() / 1000);
+
+    const expiringKeys = await db.all(
+      `SELECT ak.id, ak.name, ak.expires_at, ak.user_id, u.email
+       FROM api_keys ak
+       JOIN users u ON u.id = ak.user_id
+       WHERE ak.revoked = 0
+         AND ak.expires_at IS NOT NULL
+         AND ak.expires_at > ?
+         AND ak.expires_at < ?
+         AND ak.expiry_notified = 0`,
+      [now, now + sevenDays]
+    );
+
+    for (const key of expiringKeys) {
+      const daysLeft = Math.ceil((key.expires_at - now) / 86400);
+
+      EmailService
+        .sendKeyExpiryWarning(key.email, key.name, daysLeft, key.expires_at)
+        .then(() =>
+          db.run(
+            `UPDATE api_keys SET expiry_notified = 1 WHERE id = ?`,
+            [key.id]
+          )
+        )
+        .catch(err => {
+          console.error(`[expiry] Failed for key ${key.id}:`, err.message);
+        });
+    }
+
+    if (expiringKeys.length > 0) {
+      console.log(`[expiry] Notified ${expiringKeys.length} expiring key(s)`);
+    }
+  } catch (err) {
+    console.error('[expiry] Job error:', err.message);
+  } finally {
+    setTimeout(checkKeyExpiry, 24 * 60 * 60 * 1000);
   }
 }
 
@@ -93,6 +141,8 @@ app.get('/v1/status/history', async (req, res, next) => {
 
 app.use('/v1/keys', keysRouter);
 app.use('/v1/auth', authLimiter, authRouter);
+app.use('/v1/audit', auditRouter);
+app.use('/v1/export', exportRouter);
 
 // ─── Protected routes (require valid API key) ──────────────────────────────
 
@@ -123,6 +173,7 @@ const PORT = process.env.PORT || 3000;
 async function start() {
   await migrateInit();
   scheduleStatusJob();
+  checkKeyExpiry();
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Staark API running on port ${PORT}`);
   });

@@ -1,4 +1,5 @@
-import TaskService from '../services/TaskService.js';
+import TaskService   from '../services/TaskService.js';
+import AuditService  from '../services/AuditService.js';
 
 class TasksController {
 
@@ -55,6 +56,8 @@ class TasksController {
         tags,
       });
 
+      AuditService.log(req.auth.user_id, 'task.created', 'task', task.id, { title: task.title, project_id: projectId }, req.ip);
+
       return res.status(201).json({ ok: true, data: task });
     } catch (err) {
       next(err);
@@ -108,6 +111,8 @@ class TasksController {
         });
       }
 
+      AuditService.log(req.auth.user_id, 'task.updated', 'task', id, { fields: Object.keys(fields) }, req.ip);
+
       return res.json({ ok: true, data: task });
     } catch (err) {
       next(err);
@@ -129,6 +134,8 @@ class TasksController {
           error: { code: 'NOT_FOUND', message: `Task '${req.params.id}' not found` }
         });
       }
+
+      AuditService.log(req.auth.user_id, 'task.deleted', 'task', req.params.id, null, req.ip);
 
       return res.status(204).send();
     } catch (err) {

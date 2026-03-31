@@ -68,6 +68,7 @@ export async function up() {
       key_prefix  VARCHAR(32)   NOT NULL,
       key_hash    VARCHAR(255)  NOT NULL,
       plan        VARCHAR(32)   NOT NULL DEFAULT 'free',
+      label       VARCHAR(32)   NOT NULL DEFAULT 'development',
       expires_at  BIGINT,
       last_used   BIGINT,
       revoked     TINYINT(1)    NOT NULL DEFAULT 0,
@@ -147,6 +148,31 @@ export async function up() {
       INDEX idx_user_id (user_id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
   `);
+
+  // ── Audit log ──────────────────────────────────────────────────────────────
+  await db.run(`
+    CREATE TABLE IF NOT EXISTS audit_log (
+      id          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+      user_id     VARCHAR(64)  NOT NULL,
+      action      VARCHAR(64)  NOT NULL,
+      entity_type VARCHAR(32),
+      entity_id   VARCHAR(64),
+      details     JSON,
+      ip          VARCHAR(64),
+      created_at  BIGINT DEFAULT (UNIX_TIMESTAMP()),
+      INDEX idx_user_action (user_id, created_at)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+  `);
+
+  // ── ALTER api_keys: coloana expiry_notified ────────────────────────────────
+  try {
+    await db.run(`
+      ALTER TABLE api_keys
+      ADD COLUMN IF NOT EXISTS expiry_notified TINYINT DEFAULT 0
+    `);
+  } catch (err) {
+    if (err.code !== 'ER_DUP_FIELDNAME') throw err;
+  }
 
   console.log('[migrate] all tables ready');
 }
